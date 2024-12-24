@@ -9,7 +9,7 @@ Dies ist die Einleitung.
 
 ## Hauptinhalt
 
-Dies ist der Hauptinhalt.
+Unsere neue Website wird hier in kürze erreichbar sein.
 
 ## Fazit
 

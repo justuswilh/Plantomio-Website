@@ -27,9 +27,7 @@ function extractSection(body, sectionTitle) {
 }
 
 // Computed Properties für jede Sektion
-const einleitung = computed(() => extractSection(data.value?.body, 'Einleitung'))
 const hauptinhalt = computed(() => extractSection(data.value?.body, 'Hauptinhalt'))
-const fazit = computed(() => extractSection(data.value?.body, 'Fazit'))
 const picture = computed(() => extractSection(data.value?.body, 'Picture'))
 
 // Optional: Debugging Logs
@@ -46,28 +44,14 @@ watch(data, (newData) => {
     <div v-if="data">
       <h1>{{ data.title }}</h1>
 
-      <!-- Einleitung -->
-      <section v-if="einleitung.length">
-        <h2>Einleitung</h2>
-        <ASTRenderer :nodes="einleitung" />
+      <!-- Picture -->
+      <section v-if="picture.length" class="flex mt-28 justify-center">
+        <ASTRenderer :nodes="picture" />
       </section>
 
       <!-- Hauptinhalt -->
-      <section v-if="hauptinhalt.length">
-        <h2>Hauptinhalt</h2>
+      <section v-if="hauptinhalt.length" class="flex mt-24 justify-center text-3xl">
         <ASTRenderer :nodes="hauptinhalt" />
-      </section>
-
-      <!-- Fazit -->
-      <section v-if="fazit.length">
-        <h2>Fazit</h2>
-        <ASTRenderer :nodes="fazit" />
-      </section>
-
-      <!-- Picture -->
-      <section v-if="picture.length">
-        <h2>Picture</h2>
-        <ASTRenderer :nodes="picture" />
       </section>
     </div>
 
