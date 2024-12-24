@@ -1,6 +1,6 @@
 ---
-title: "Meine Seite"
-description: "Beschreibung der Seite"
+title: Meine Seite
+description: Beschreibung der Seite
 ---
 
 ## Einleitung
