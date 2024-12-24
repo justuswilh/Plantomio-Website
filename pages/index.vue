@@ -42,8 +42,6 @@ watch(data, (newData) => {
 <template>
   <div>
     <div v-if="data">
-      <h1>{{ data.title }}</h1>
-
       <!-- Picture -->
       <section v-if="picture.length" class="flex mt-28 justify-center">
         <ASTRenderer :nodes="picture" />
