@@ -1,12 +1,12 @@
 ---
-title: WaitingPage
-description: Warteseite bis zum Websiterelease
+title: Warteseite
+description: Vorrübergehend wegen wartung offline
 ---
 
-## Picture1
+## Hauptinhalt
+
+Das Smart-Home für deine Pflanzen.
+
+## Picture
 
 ![Plantomio Logo](/Logo.svg)
-
-## überschrift1
-
-Unsere neue Website wird hier in kürze erreichbar sein.

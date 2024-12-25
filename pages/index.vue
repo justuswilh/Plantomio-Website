@@ -4,7 +4,7 @@ import ASTRenderer from '~/components/ASTRenderer.vue' // Pfad anpassen
 import { useAsyncData } from 'nuxt/app' // Beispiel-Import, anpassen je nach Setup
 
 // Asynchrone Daten laden
-const { data, pending, error } = await useAsyncData('waitingpage', () => queryContent('waitingpage').findOne())
+const { data, pending, error } = await useAsyncData('content', () => queryContent('home').findOne())
 
 // Funktion zum Extrahieren einer Sektion basierend auf der Überschrift
 function extractSection(body, sectionTitle) {
@@ -64,22 +64,38 @@ watch(data, (newData) => {
     <div
       :class="['main-content', { 'visible': !showOverlay }, 'flex flex-col items-center justify-center min-h-screen']"
     >
-      <div v-if="data" class="w-full max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div v-if="data" class="w-full">
         <!-- Picture -->
-        <section v-if="picture.length" class="flex justify-center mt-2 sm:mt-2 lg:mt-4 w-full">
+        <section v-if="picture.length" class="flex justify-center h-screen mt-2 sm:mt-2 lg:mt-40 w-full">
           <ASTRenderer 
             :nodes="picture" 
             class="w-content max-w-md sm:max-w-lg lg:max-w-xl mx-auto items-center object-cover sm:object-contain text-base sm:text-lg lg:text-xl" 
           />
         </section>
 
+        <!-- Effekt 1 -->
+        <section class="flex flex-col justify-center w-full bg-gray-100">
+          <div class="text-center content-center items-center align-middle text-4xl sm:text-5xl h-screen lg:text-6xl font-bold">
+            SMARTHOME
+          </div>
+          <div class="h-screen flex flex-col">
+            <div class="text-center h-1/2 content-center text-4xl sm:text-5xl lg:text-6xl font-bold">
+            TRIFFT
+            </div>
+            <div class="text-center h-1/2 content-center text-4xl sm:text-5xl lg:text-6xl font-bold">
+            BOTANIK
+            </div>
+          </div>
+        </section>
+
         <!-- Hauptinhalt -->
-        <section v-if="hauptinhalt.length" class="flex flex-col items-center justify-center mt-8 sm:mt-12 lg:mt-16">
+        <section v-if="hauptinhalt.length" class="flex h-screen flex-col items-center justify-center mt-8 sm:mt-12 lg:mt-16">
           <ASTRenderer 
             :nodes="hauptinhalt" 
             class="w-full max-w-2xl mx-auto sm:mx-0 text-center font-semibold text-2xl sm:text-3xl lg:text-4xl" 
           />
         </section>
+
       </div>
 
       <!-- Ladezustand und Fehler anzeigen -->
@@ -139,4 +155,4 @@ watch(data, (newData) => {
     /* Zusätzliche Styles für extra große Bildschirme */
   }
 }
-</style>
+</style> 
