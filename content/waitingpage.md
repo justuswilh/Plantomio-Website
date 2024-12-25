@@ -1,19 +1,11 @@
 ---
-title: Meine Seite
-description: Beschreibung der Seite
+title: Warteseite
+description: Vorrübergehend wegen wartung offline
 ---
-
-## Einleitung
-
-Dies ist die Einleitung.
 
 ## Hauptinhalt
 
 Unsere neue Website wird hier in kürze erreichbar sein.
-
-## Fazit
-
-Dies ist das Fazit.
 
 ## Picture
 

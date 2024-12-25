@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import ASTRenderer from '~/components/ASTRenderer.vue' // Pfad anpassen
 import { useAsyncData } from 'nuxt/app' // Beispiel-Import, anpassen je nach Setup
 
@@ -30,6 +30,17 @@ function extractSection(body, sectionTitle) {
 const hauptinhalt = computed(() => extractSection(data.value?.body, 'Hauptinhalt'))
 const picture = computed(() => extractSection(data.value?.body, 'Picture'))
 
+// Overlay State
+const showOverlay = ref(true)
+
+// Nach dem Mounten das Overlay ausblenden und Inhalt animieren
+onMounted(() => {
+  // Minimaler Delay, um sicherzustellen, dass das Overlay gerendert wird
+  setTimeout(() => {
+    showOverlay.value = false
+  }, 10) // 10ms Verzögerung
+})
+
 // Optional: Debugging Logs
 watch(data, (newData) => {
   if (newData.value) {
@@ -40,21 +51,92 @@ watch(data, (newData) => {
 </script>
 
 <template>
-  <div>
-    <div v-if="data">
-      <!-- Picture -->
-      <section v-if="picture.length" class="flex mt-28 justify-center">
-        <ASTRenderer :nodes="picture" />
-      </section>
+  <div class="relative">
+    <!-- Overlay -->
+    <transition name="fade">
+      <div
+        v-if="showOverlay"
+        class="fixed inset-0 bg-black z-50"
+      ></div>
+    </transition>
 
-      <!-- Hauptinhalt -->
-      <section v-if="hauptinhalt.length" class="flex mt-24 justify-center text-3xl">
-        <ASTRenderer :nodes="hauptinhalt" />
-      </section>
+    <!-- Hauptinhalt der Seite mit Slide-In Animation -->
+    <div
+      :class="['main-content', { 'visible': !showOverlay }, 'flex flex-col items-center justify-center min-h-screen']"
+    >
+      <div v-if="data" class="w-full max-w-4xl px-4 sm:px-6 lg:px-8">
+        <!-- Picture -->
+        <section v-if="picture.length" class="flex justify-center mt-2 sm:mt-2 lg:mt-4 w-full">
+          <ASTRenderer 
+            :nodes="picture" 
+            class="w-content max-w-md sm:max-w-lg lg:max-w-xl mx-auto items-center object-cover sm:object-contain text-base sm:text-lg lg:text-xl" 
+          />
+        </section>
+
+        <!-- Hauptinhalt -->
+        <section v-if="hauptinhalt.length" class="flex flex-col items-center justify-center mt-8 sm:mt-12 lg:mt-16">
+          <ASTRenderer 
+            :nodes="hauptinhalt" 
+            class="w-full max-w-2xl mx-auto sm:mx-0 text-center font-semibold text-2xl sm:text-3xl lg:text-4xl" 
+          />
+        </section>
+      </div>
+
+      <!-- Ladezustand und Fehler anzeigen -->
+      <div v-if="pending" class="text-center mt-6 sm:mt-8 text-lg sm:text-xl">Lade...</div>
+      <div v-if="error" class="text-center mt-4 text-red-500 text-base sm:text-lg">
+        Fehler: {{ error.message }}
+      </div>
     </div>
-
-    <!-- Ladezustand und Fehler anzeigen -->
-    <div v-if="pending">Lade...</div>
-    <div v-if="error">Fehler: {{ error.message }}</div>
   </div>
 </template>
+
+<style scoped>
+/* Overlay fade transition */
+.fade-leave-active {
+  transition: opacity 1.2s ease-in-out;
+}
+.fade-leave-from {
+  opacity: 1;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Main content slide-in transition */
+.main-content {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out;
+}
+
+.main-content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive Text and Image Adjustments */
+@media (min-width: 640px) { /* sm */
+  .main-content {
+    /* Zusätzliche Styles für kleine Bildschirme */
+  }
+}
+
+@media (min-width: 768px) { /* md */
+  .main-content {
+    /* Zusätzliche Styles für mittlere Bildschirme */
+  }
+}
+
+@media (min-width: 1024px) { /* lg */
+  .main-content {
+    /* Zusätzliche Styles für große Bildschirme */
+  }
+}
+
+@media (min-width: 1280px) { /* xl */
+  .main-content {
+    /* Zusätzliche Styles für extra große Bildschirme */
+  }
+}
+</style>
