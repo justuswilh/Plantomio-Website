@@ -1,5 +1,5 @@
 <template>
-  <div class="relative">
+  <div class="relative flex flex-col items-center justify-center min-h-screen">
     <!-- Initiales Overlay mit Fade-Out Transition -->
     <transition name="fade">
       <div
@@ -34,7 +34,7 @@
           v-if="picture.length" 
           ref="pictureSection" 
           :style="{ transform: pictureTransform }" 
-          class="flex justify-center pt-2 sm:pt-20 lg:pt-48 w-full relative overflow-hidden"
+          class="flex justify-center pt-32 sm:pt-40 lg:pt-48 w-full relative overflow-hidden"
         >
           <ASTRenderer 
             :nodes="picture" 
