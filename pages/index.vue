@@ -1,10 +1,12 @@
 <template>
   <div class="relative">
-    <!-- Initiales Overlay -->
-    <div
-      v-if="showOverlay"
-      class="fixed inset-0 bg-black z-40"
-    ></div>
+    <!-- Initiales Overlay mit Fade-Out Transition -->
+    <transition name="fade">
+      <div
+        v-if="showOverlay"
+        class="fixed inset-0 bg-black z-40"
+      ></div>
+    </transition>
 
     <!-- Scroll Overlay -->
     <div
@@ -32,7 +34,7 @@
           v-if="picture.length" 
           ref="pictureSection" 
           :style="{ transform: pictureTransform }" 
-          class="flex justify-center h-screen pt-2 sm:pt-20 lg:pt-48 w-full relative overflow-hidden"
+          class="flex justify-center pt-2 sm:pt-20 lg:pt-48 w-full relative overflow-hidden"
         >
           <ASTRenderer 
             :nodes="picture" 
@@ -45,25 +47,25 @@
           class="flex flex-col justify-center w-full"
         >
           <div 
-            class="text-center content-center items-center align-middle text-4xl sm:text-5xl lg:text-6xl font-bold relative"
+            class="text-center content-center items-center text-white align-middle text-4xl sm:text-5xl lg:text-6xl font-bold relative"
             ref="smarthomeSection"
           >
             SMARTHOME
           </div>
           <div 
-            class="text-center mt-60 content-center text-4xl text-white sm:text-5xl lg:text-6xl font-bold relative"
+            class="text-center mt-40 content-center text-4xl text-white sm:text-5xl lg:text-6xl font-bold relative"
             ref="trifftSection"
           >
             TRIFFT
           </div>
           <div 
-            class="text-center mt-60 content-center text-4xl text-white sm:text-5xl lg:text-6xl font-bold relative"
+            class="text-center mt-40 content-center text-4xl text-white sm:text-5xl lg:text-6xl font-bold relative"
             ref="botanikMarkerSection"
           >
             BOTANIK_MARKER
           </div>
           <div 
-            class="text-center mt-60 content-center text-4xl sm:text-5xl lg:text-8xl font-bold relative"
+            class="text-center mt-40 content-center text-4xl sm:text-5xl lg:text-8xl font-bold relative"
             ref="botanikSection"
           >
             BOTANIK
@@ -121,7 +123,7 @@ const hauptinhalt = computed(() => extractSection(data.value?.body, 'Hauptinhalt
 const picture = computed(() => extractSection(data.value?.body, 'Picture'))
 
 // Overlay States
-const showOverlay = ref(true)
+const showOverlay = ref(true) // Initial auf true setzen, um das Overlay anzuzeigen
 const showScrollOverlay = ref(false) // Zustand für Scroll-Overlay
 
 // Central Text State
@@ -143,8 +145,16 @@ const trifftLogged = ref(false)
 const botanikMarkerLogged = ref(false)
 const botanikLogged = ref(false)
 
+// Flag to check if user has scrolled
+const hasScrolled = ref(false)
+
 // Funktion zum Überprüfen der Position der Elemente
 function checkPositions() {
+  if (!hasScrolled.value) {
+    // Do not update overlays or central text if user hasn't scrolled
+    return
+  }
+
   const viewportCenter = window.scrollY + window.innerHeight / 2
 
   // Berechnung der Positionen der Mittelpunkte der Sektionen
@@ -256,7 +266,7 @@ function checkPositions() {
   // Transformation für das Bild anwenden
   if (pictureSection.value) {
     const scrollY = window.scrollY
-    const transformValue = `translateY(-${scrollY * 1}px)`
+    const transformValue = `translateY(-${scrollY * 1.8}px)`
     pictureTransform.value = transformValue
   }
 }
@@ -264,6 +274,9 @@ function checkPositions() {
 // Throttling mit requestAnimationFrame
 let ticking = false
 function onScroll() {
+  if (!hasScrolled.value) {
+    hasScrolled.value = true
+  }
   if (!ticking) {
     window.requestAnimationFrame(() => {
       checkPositions()
@@ -276,13 +289,10 @@ function onScroll() {
 onMounted(async () => {
   await nextTick() // Sicherstellen, dass DOM gerendert ist
 
-  // Initialer Overlay-Delay
+  // Start des Fade-Out nach kurzer Verzögerung (z.B. 100ms)
   setTimeout(() => {
     showOverlay.value = false
-  }, 40) // 1.2 Sekunden Verzögerung, um den Overlay ausblenden zu sehen
-
-  // Initiale Positionsüberprüfung
-  checkPositions()
+  }, 100) // 100 Millisekunden Verzögerung, um den Transition-Start zu gewährleisten
 
   // Scroll-Listener hinzufügen
   window.addEventListener('scroll', onScroll)
@@ -297,7 +307,24 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Entferne alle Fade-Transition Styles */
+/* Fade-Out Transition für das Overlay */
+.fade-leave-active {
+  transition: opacity 1.2s ease;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Optional: Fade-In Transition (falls benötigt) */
+.fade-enter-active {
+  transition: opacity 1.2s ease;
+}
+.fade-enter-from {
+  opacity: 0;
+}
+.fade-enter-to {
+  opacity: 1;
+}
 
 /* Main content slide-in transition */
 .main-content {

@@ -5,7 +5,7 @@ description: Vorrübergehend wegen wartung offline
 
 ## Hauptinhalt
 
-Das Smart-Home für deine Pflanzen.
+Unsere neue Website wird hier in kürze erreichbar sein
 
 ## Picture
 
