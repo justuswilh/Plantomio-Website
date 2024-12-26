@@ -34,7 +34,7 @@
           v-if="picture.length" 
           ref="pictureSection" 
           :style="{ transform: pictureTransform }" 
-          class="flex justify-center pt-32 sm:pt-40 lg:pt-48 w-full relative overflow-hidden"
+          class="flex items-center h-screen w-full relative overflow-hidden"
         >
           <ASTRenderer 
             :nodes="picture" 
@@ -47,19 +47,24 @@
           class="flex flex-col justify-center w-full"
         >
           <div 
-            class="text-center content-center items-center text-white align-middle text-4xl sm:text-5xl lg:text-6xl font-bold relative"
+            class="text-center content-center items-center text-2xl sm:text-3xl lg:text-4xl font-bold relative"
+          >
+            Automatische Versorgung für deine Pflanzen!<br />Aber wie?
+          </div>
+          <div 
+            class="text-center -mt-14 invisible content-center items-center relative"
             ref="smarthomeSection"
           >
             SMARTHOME
           </div>
           <div 
-            class="text-center mt-40 content-center text-4xl text-white sm:text-5xl lg:text-6xl font-bold relative"
+            class="text-center mt-40 content-center invisible relative"
             ref="trifftSection"
           >
             TRIFFT
           </div>
           <div 
-            class="text-center mt-40 content-center text-4xl text-white sm:text-5xl lg:text-6xl font-bold relative"
+            class="text-center mt-40 content-center invisible relative"
             ref="botanikMarkerSection"
           >
             BOTANIK_MARKER
@@ -266,7 +271,7 @@ function checkPositions() {
   // Transformation für das Bild anwenden
   if (pictureSection.value) {
     const scrollY = window.scrollY
-    const transformValue = `translateY(-${scrollY * 1.8}px)`
+    const transformValue = `translateY(-${scrollY * 1}px)`
     pictureTransform.value = transformValue
   }
 }
