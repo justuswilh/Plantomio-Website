@@ -34,11 +34,11 @@
           v-if="picture.length" 
           ref="pictureSection" 
           :style="{ transform: pictureTransform }" 
-          class="flex items-center h-screen w-full relative overflow-hidden"
+          class="flex z-50 items-center h-screen w-full relative overflow-hidden"
         >
           <ASTRenderer 
             :nodes="picture" 
-            class="w-content max-w-md sm:max-w-lg lg:max-w-xl mx-auto items-center object-cover sm:object-contain text-base sm:text-lg lg:text-xl" 
+            class="w-content max-w-md sm:max-w-lg lg:max-w-xl mx-auto items-center object-cover sm:object-contain" 
           />
         </section>
 
@@ -46,35 +46,46 @@
         <section 
           class="flex flex-col justify-center w-full"
         >
+          <!-- 
+            (1) Neue :style-Bindung für den questions-Bereich. 
+                Wir verwenden das ref="questionsSection" und binden questionsTransform.
+          -->
           <div 
             class="text-center content-center items-center text-2xl sm:text-3xl lg:text-4xl font-bold relative"
+            ref="questionsSection"
+            :style="{ transform: questionsTransform }"
           >
             Automatische Versorgung für deine Pflanzen!<br />Aber wie?
           </div>
           <div 
-            class="text-center -mt-14 invisible content-center items-center relative"
+            class="text-center mt-20 invisible content-center items-center relative"
             ref="smarthomeSection"
           >
             SMARTHOME
           </div>
           <div 
-            class="text-center mt-40 content-center invisible relative"
+            class="text-center mt-48 content-center invisible relative"
             ref="trifftSection"
           >
             TRIFFT
           </div>
           <div 
-            class="text-center mt-40 content-center invisible relative"
+            class="text-center mt-48 content-center invisible relative"
             ref="botanikMarkerSection"
           >
             BOTANIK_MARKER
           </div>
           <div 
-            class="text-center mt-40 content-center text-4xl sm:text-5xl lg:text-8xl font-bold relative"
+            class="text-center mt-52 content-center text-4xl sm:text-5xl lg:text-8xl font-bold relative"
             ref="botanikSection"
           >
             BOTANIK
           </div>
+        </section>
+
+        <!-- ExplainSection -->
+        <section v-if="hauptinhalt.length" class="flex h-screen flex-col items-center justify-center mt-8 sm:mt-12 lg:mt-16">
+          <Example/>
         </section>
 
         <!-- Hauptinhalt -->
@@ -135,6 +146,7 @@ const showScrollOverlay = ref(false) // Zustand für Scroll-Overlay
 const currentCentralText = ref(null) // Neuer Zustand für zentralen Text
 
 // Refs für die beobachteten Abschnitte
+const questionsSection = ref(null)
 const smarthomeSection = ref(null)
 const trifftSection = ref(null)
 const botanikMarkerSection = ref(null)
@@ -142,9 +154,13 @@ const botanikSection = ref(null)
 const pictureSection = ref(null) // Hinzugefügt
 
 // Transformation für das Bild
-const pictureTransform = ref('translateY(0px)') // Hinzugefügt
+const pictureTransform = ref('translateY(0px)')
+
+// (2) NEUE Variable für die Fragen-Sektion (verlangsamte Bewegung)
+const questionsTransform = ref('translateY(0px)')
 
 // Flags, um Mehrfach-Logs zu verhindern
+const questionsSectionLogged = ref(false)
 const smarthomeLogged = ref(false)
 const trifftLogged = ref(false)
 const botanikMarkerLogged = ref(false)
@@ -167,6 +183,7 @@ function checkPositions() {
   let trifftCenter = 0
   let botanikMarkerCenter = 0
   let botanikCenter = 0
+  let questionsCenter = 0
 
   if (smarthomeSection.value) {
     const rect = smarthomeSection.value.getBoundingClientRect()
@@ -188,15 +205,18 @@ function checkPositions() {
     botanikCenter = window.scrollY + rect.top + rect.height / 2
   }
 
+  if (questionsSection.value) {
+    const rect = questionsSection.value.getBoundingClientRect()
+    questionsCenter = window.scrollY + rect.top + rect.height / 2
+  }
+
   // Logik zur Anzeige des Scroll-Overlays bis Botanik erreicht ist
   if (viewportCenter > smarthomeCenter && viewportCenter < botanikCenter) {
     if (!showScrollOverlay.value) {
-      console.log('Scroll Overlay wird angezeigt.')
       showScrollOverlay.value = true
     }
   } else {
     if (showScrollOverlay.value) {
-      console.log('Scroll Overlay wird ausgeblendet.')
       showScrollOverlay.value = false
     }
   }
@@ -204,30 +224,33 @@ function checkPositions() {
   // Logik zum Setzen des zentralen Texts
   if (viewportCenter >= smarthomeCenter && viewportCenter < trifftCenter) {
     if (currentCentralText.value !== 'SMARTHOME') {
-      console.log('Zentraler Text: SMARTHOME')
       currentCentralText.value = 'SMARTHOME'
     }
   } else if (viewportCenter >= trifftCenter && viewportCenter < botanikMarkerCenter) {
     if (currentCentralText.value !== 'TRIFFT') {
-      console.log('Zentraler Text: TRIFFT')
       currentCentralText.value = 'TRIFFT'
     }
   } else if (viewportCenter >= botanikMarkerCenter && viewportCenter < botanikCenter) {
     if (currentCentralText.value !== 'BOTANIK') {
-      console.log('Zentraler Text: BOTANIK')
       currentCentralText.value = 'BOTANIK'
     }
   } else {
     // Außerhalb der definierten Bereiche den zentralen Text entfernen
     if (currentCentralText.value !== null) {
-      console.log('Zentraler Text entfernt.')
       currentCentralText.value = null
     }
   }
 
+  // Logik zum Loggen, wenn QUESTIONS in der Mitte ist
+  if (!questionsSectionLogged.value && Math.abs(viewportCenter - questionsCenter) <= 10) {
+    console.log('QUESTIONS ist jetzt in der Bildschirmmitte.')
+    questionsSectionLogged.value = true
+  } else if (questionsSectionLogged.value && viewportCenter < questionsCenter - 10) {
+    questionsSectionLogged.value = false
+  }
+
   // Logik zum Loggen, wenn SMARTHOME in der Mitte ist
   if (!smarthomeLogged.value && Math.abs(viewportCenter - smarthomeCenter) <= 10) {
-    console.log('SMARTHOME ist jetzt in der Bildschirmmitte.')
     smarthomeLogged.value = true
   } else if (smarthomeLogged.value && viewportCenter < smarthomeCenter - 10) {
     smarthomeLogged.value = false
@@ -268,7 +291,7 @@ function checkPositions() {
     botanikLogged.value = false
   }
 
-  // Transformation für das Bild anwenden
+  // Transformation für das Bild
   if (pictureSection.value) {
     const scrollY = window.scrollY
     const transformValue = `translateY(-${scrollY * 1}px)`
