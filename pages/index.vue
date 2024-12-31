@@ -1,373 +1,225 @@
 <template>
-  <div class="relative flex flex-col items-center justify-center min-h-screen">
-    <!-- Initiales Overlay mit Fade-Out Transition -->
-    <transition name="fade">
-      <div
-        v-if="showOverlay"
-        class="fixed inset-0 bg-black z-40"
-      ></div>
-    </transition>
-
-    <!-- Scroll Overlay -->
-    <div
-      v-if="showScrollOverlay"
-      class="fixed inset-0 bg-white z-30"
-    ></div>
-
-    <!-- Zentrales Textelement -->
-    <div
-      v-if="currentCentralText"
-      class="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
-    >
-      <h1 class="text-black text-4xl sm:text-5xl lg:text-8xl font-bold">
-        {{ currentCentralText }}
-      </h1>
+    <div class="scroll-container">
+      
+      <!-- 1) Schwarzes Overlay (fixed) -->
+      <div id="black-overlay" class="black-overlay"></div>
+  
+      <!-- 2) Image-Abschnitt (normal im Flow) -->
+      <section
+        id="image-section"
+        class="flex items-center justify-center h-screen w-full"
+      >
+        <img
+          id="hero-image"
+          src="/Logo.svg"
+          alt="Hero"
+          class="w-content max-w-md sm:max-w-lg lg:max-w-xl mx-auto items-center object-cover sm:object-contain"
+        />
+      </section>
+  
+      <!-- 3) Erste Überschrift (pinned + skaliert) -->
+      <section
+        id="pinned-heading-section"
+        class="pinned-heading-section"
+      >
+        <h1 id="pinned-heading" class="pinned-heading">
+          Automatische Versorgung für deine Pflanzen!<br />
+          Aber wie?
+        </h1>
+      </section>
+  
+      <!-- 4) Wort-Abschnitt (pinned) -->
+      <section
+        id="word-section"
+        class="word-section"
+      >
+        <div id="effekt-word1" class="effekt-word1">Wort1</div>
+        <div id="effekt-word2" class="effekt-word2">Wort2</div>
+        <div id="effekt-word3" class="effekt-word3">Wort3</div>
+      </section>
+  
+      <!-- 5) Nächste Überschrift (normaler Fluss) -->
+      <section
+        id="next-heading-section"
+        class="next-heading-section"
+      >
+        <h2 id="next-heading">Nächste Überschrift</h2>
+        <p>Lorem ipsum dolor sit amet ...</p>
+      </section>
+  
     </div>
-
-    <!-- Hauptinhalt der Seite mit Slide-In Animation -->
-    <div
-      :class="['main-content', { 'visible': !showOverlay }, 'flex flex-col items-center justify-center min-h-screen']"
-    >
-      <div v-if="data" class="w-full">
-        <!-- Picture -->
-        <section 
-          v-if="picture.length" 
-          ref="pictureSection" 
-          :style="{ transform: pictureTransform }" 
-          class="flex z-50 items-center h-screen w-full relative overflow-hidden"
-        >
-          <ASTRenderer 
-            :nodes="picture" 
-            class="w-content max-w-md sm:max-w-lg lg:max-w-xl mx-auto items-center object-cover sm:object-contain" 
-          />
-        </section>
-
-        <!-- Effekt 1 -->
-        <section 
-          class="flex flex-col justify-center w-full"
-        >
-          <!-- 
-            (1) Neue :style-Bindung für den questions-Bereich. 
-                Wir verwenden das ref="questionsSection" und binden questionsTransform.
-          -->
-          <div 
-            class="text-center content-center items-center text-2xl sm:text-3xl lg:text-4xl font-bold relative"
-            ref="questionsSection"
-            :style="{ transform: questionsTransform }"
-          >
-            Automatische Versorgung für deine Pflanzen!<br />Aber wie?
-          </div>
-          <div 
-            class="text-center mt-20 invisible content-center items-center relative"
-            ref="smarthomeSection"
-          >
-            SMARTHOME
-          </div>
-          <div 
-            class="text-center mt-48 content-center invisible relative"
-            ref="trifftSection"
-          >
-            TRIFFT
-          </div>
-          <div 
-            class="text-center mt-48 content-center invisible relative"
-            ref="botanikMarkerSection"
-          >
-            BOTANIK_MARKER
-          </div>
-          <div 
-            class="text-center mt-52 content-center text-4xl sm:text-5xl lg:text-8xl font-bold relative"
-            ref="botanikSection"
-          >
-            BOTANIK
-          </div>
-        </section>
-
-        <!-- ExplainSection -->
-        <section v-if="hauptinhalt.length" class="flex h-screen flex-col items-center justify-center mt-8 sm:mt-12 lg:mt-16">
-          <Example/>
-        </section>
-
-        <!-- Hauptinhalt -->
-        <section v-if="hauptinhalt.length" class="flex h-screen flex-col items-center justify-center mt-8 sm:mt-12 lg:mt-16">
-          <ASTRenderer 
-            :nodes="hauptinhalt" 
-            class="w-full max-w-2xl mx-auto sm:mx-0 text-center font-semibold text-2xl sm:text-3xl lg:text-4xl" 
-          />
-        </section>
-      </div>
-
-      <!-- Ladezustand und Fehler anzeigen -->
-      <div v-if="pending" class="text-center mt-6 sm:mt-8 text-lg sm:text-xl">Lade...</div>
-      <div v-if="error" class="text-center mt-4 text-red-500 text-base sm:text-lg">
-        Fehler: {{ error.message }}
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import ASTRenderer from '~/components/ASTRenderer.vue' // Pfad anpassen
-import { useAsyncData } from 'nuxt/app' // Beispiel-Import, anpassen je nach Setup
-
-// Asynchrone Daten laden
-const { data, pending, error } = await useAsyncData('content', () => queryContent('home').findOne())
-
-// Funktion zum Extrahieren einer Sektion basierend auf der Überschrift
-function extractSection(body, sectionTitle) {
-  if (!body || !body.children) return []
-
-  const sections = {}
-  let currentSection = null
-
-  body.children.forEach(node => {
-    if (node.type === 'element' && node.tag === 'h2') {
-      const title = node.children[0].value
-      currentSection = title
-      sections[currentSection] = []
-    } else if (currentSection) {
-      sections[currentSection].push(node)
-    }
-  })
-
-  return sections[sectionTitle] || []
-}
-
-// Computed Properties für jede Sektion
-const hauptinhalt = computed(() => extractSection(data.value?.body, 'Hauptinhalt'))
-const picture = computed(() => extractSection(data.value?.body, 'Picture'))
-
-// Overlay States
-const showOverlay = ref(true) // Initial auf true setzen, um das Overlay anzuzeigen
-const showScrollOverlay = ref(false) // Zustand für Scroll-Overlay
-
-// Central Text State
-const currentCentralText = ref(null) // Neuer Zustand für zentralen Text
-
-// Refs für die beobachteten Abschnitte
-const questionsSection = ref(null)
-const smarthomeSection = ref(null)
-const trifftSection = ref(null)
-const botanikMarkerSection = ref(null)
-const botanikSection = ref(null)
-const pictureSection = ref(null) // Hinzugefügt
-
-// Transformation für das Bild
-const pictureTransform = ref('translateY(0px)')
-
-// (2) NEUE Variable für die Fragen-Sektion (verlangsamte Bewegung)
-const questionsTransform = ref('translateY(0px)')
-
-// Flags, um Mehrfach-Logs zu verhindern
-const questionsSectionLogged = ref(false)
-const smarthomeLogged = ref(false)
-const trifftLogged = ref(false)
-const botanikMarkerLogged = ref(false)
-const botanikLogged = ref(false)
-
-// Flag to check if user has scrolled
-const hasScrolled = ref(false)
-
-// Funktion zum Überprüfen der Position der Elemente
-function checkPositions() {
-  if (!hasScrolled.value) {
-    // Do not update overlays or central text if user hasn't scrolled
-    return
-  }
-
-  const viewportCenter = window.scrollY + window.innerHeight / 2
-
-  // Berechnung der Positionen der Mittelpunkte der Sektionen
-  let smarthomeCenter = 0
-  let trifftCenter = 0
-  let botanikMarkerCenter = 0
-  let botanikCenter = 0
-  let questionsCenter = 0
-
-  if (smarthomeSection.value) {
-    const rect = smarthomeSection.value.getBoundingClientRect()
-    smarthomeCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  if (trifftSection.value) {
-    const rect = trifftSection.value.getBoundingClientRect()
-    trifftCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  if (botanikMarkerSection.value) {
-    const rect = botanikMarkerSection.value.getBoundingClientRect()
-    botanikMarkerCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  if (botanikSection.value) {
-    const rect = botanikSection.value.getBoundingClientRect()
-    botanikCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  if (questionsSection.value) {
-    const rect = questionsSection.value.getBoundingClientRect()
-    questionsCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  // Logik zur Anzeige des Scroll-Overlays bis Botanik erreicht ist
-  if (viewportCenter > smarthomeCenter && viewportCenter < botanikCenter) {
-    if (!showScrollOverlay.value) {
-      showScrollOverlay.value = true
-    }
-  } else {
-    if (showScrollOverlay.value) {
-      showScrollOverlay.value = false
-    }
-  }
-
-  // Logik zum Setzen des zentralen Texts
-  if (viewportCenter >= smarthomeCenter && viewportCenter < trifftCenter) {
-    if (currentCentralText.value !== 'SMARTHOME') {
-      currentCentralText.value = 'SMARTHOME'
-    }
-  } else if (viewportCenter >= trifftCenter && viewportCenter < botanikMarkerCenter) {
-    if (currentCentralText.value !== 'TRIFFT') {
-      currentCentralText.value = 'TRIFFT'
-    }
-  } else if (viewportCenter >= botanikMarkerCenter && viewportCenter < botanikCenter) {
-    if (currentCentralText.value !== 'BOTANIK') {
-      currentCentralText.value = 'BOTANIK'
-    }
-  } else {
-    // Außerhalb der definierten Bereiche den zentralen Text entfernen
-    if (currentCentralText.value !== null) {
-      currentCentralText.value = null
-    }
-  }
-
-  // Logik zum Loggen, wenn QUESTIONS in der Mitte ist
-  if (!questionsSectionLogged.value && Math.abs(viewportCenter - questionsCenter) <= 10) {
-    console.log('QUESTIONS ist jetzt in der Bildschirmmitte.')
-    questionsSectionLogged.value = true
-  } else if (questionsSectionLogged.value && viewportCenter < questionsCenter - 10) {
-    questionsSectionLogged.value = false
-  }
-
-  // Logik zum Loggen, wenn SMARTHOME in der Mitte ist
-  if (!smarthomeLogged.value && Math.abs(viewportCenter - smarthomeCenter) <= 10) {
-    smarthomeLogged.value = true
-  } else if (smarthomeLogged.value && viewportCenter < smarthomeCenter - 10) {
-    smarthomeLogged.value = false
-  }
-
-  // Logik zum Loggen, wenn TRIFFT in der Mitte ist
-  if (!trifftLogged.value && Math.abs(viewportCenter - trifftCenter) <= 10) {
-    console.log('TRIFFT ist jetzt in der Bildschirmmitte.')
-    trifftLogged.value = true
-  } else if (trifftLogged.value && viewportCenter < trifftCenter - 10) {
-    trifftLogged.value = false
-  }
-
-  // Logik zum Loggen, wenn BOTANIK_MARKER in der Mitte ist
-  if (!botanikMarkerLogged.value && Math.abs(viewportCenter - botanikMarkerCenter) <= 10) {
-    console.log('BOTANIK_MARKER ist jetzt in der Bildschirmmitte.')
-    botanikMarkerLogged.value = true
-  } else if (botanikMarkerLogged.value && viewportCenter < botanikMarkerCenter - 10) {
-    botanikMarkerLogged.value = false
-  }
-
-  // Logik zum Loggen, wenn BOTANIK in der Mitte ist
-  if (!botanikLogged.value && Math.abs(viewportCenter - botanikCenter) <= 10) {
-    console.log('BOTANIK ist jetzt in der Bildschirmmitte.')
-    botanikLogged.value = true
-
-    // Overlay und zentralen Text ausblenden
-    if (showScrollOverlay.value) {
-      showScrollOverlay.value = false
-      console.log('Scroll Overlay wird ausgeblendet.')
-    }
-
-    if (currentCentralText.value !== null) {
-      currentCentralText.value = null
-      console.log('Zentraler Text entfernt.')
-    }
-  } else if (botanikLogged.value && viewportCenter > botanikCenter + 10) {
-    botanikLogged.value = false
-  }
-
-  // Transformation für das Bild
-  if (pictureSection.value) {
-    const scrollY = window.scrollY
-    const transformValue = `translateY(-${scrollY * 1}px)`
-    pictureTransform.value = transformValue
-  }
-}
-
-// Throttling mit requestAnimationFrame
-let ticking = false
-function onScroll() {
-  if (!hasScrolled.value) {
-    hasScrolled.value = true
-  }
-  if (!ticking) {
-    window.requestAnimationFrame(() => {
-      checkPositions()
-      ticking = false
+  </template>
+  
+  <script setup lang="ts">
+  import { gsap } from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+  
+  gsap.registerPlugin(ScrollTrigger)
+  
+  onMounted(() => {
+    // Overlay Animation
+    gsap.set('#black-overlay', { autoAlpha: 1 })
+    gsap.to('#black-overlay', {
+      autoAlpha: 0,
+      duration: 1.2,
+      delay: 0.2
     })
-    ticking = true
+  
+    gsap.fromTo('#hero-image',
+      { y: '20%', autoAlpha: 0 },
+      { y: '0%', autoAlpha: 1, duration: 1.2, delay: 0.2 }
+    )
+  
+    // Scroll-triggered Animations
+    initGsapAnimations()
+  })
+  
+  function initGsapAnimations() {
+  
+    // Animation für #pinned-heading
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: '#pinned-heading',
+        start: 'top+=50 center',
+        end: 'bottom+=150 center',
+        pin: true,
+        scrub: true,
+        markers: true,
+        onEnterBack: () => {
+          gsap.set('#pinned-heading', { autoAlpha: 1 });
+        },
+      }
+    })
+    .fromTo(
+      '#pinned-heading',
+      { scale: 1 },
+      { scale: 1.2, duration: 0.2 }
+    )
+  
+    // ScrollTrigger für schlagartiges Einblenden von #effekt-word1
+    ScrollTrigger.create({
+      trigger: '#effekt-word1',
+      start: 'top+=50 center',
+      end: 'bottom+=220 center',
+      pin: true,
+      onEnter: () => {
+              gsap.set('#pinned-heading', { autoAlpha: 0 });
+              gsap.set('#effekt-word1', { autoAlpha: 1 });
+              },
+      onEnterBack: () =>  {
+              gsap.set('#pinned-heading', { autoAlpha: 1 });
+              gsap.set('#effekt-word1', { autoAlpha: 0 });
+              },
+      onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
+      markers: true
+    });
+  
+    ScrollTrigger.create({
+      trigger: '#effekt-word2',
+      start: 'top+=50 center',
+      end: 'bottom+=150 center',
+      pin: true,
+      onEnter: () => {
+        gsap.set('#effekt-word1', { autoAlpha: 0 });
+        gsap.set('#effekt-word2', { autoAlpha: 1 });
+      },
+      onEnterBack: () => {
+        gsap.set('#effekt-word1', { autoAlpha: 1 });
+        gsap.set('#effekt-word2', { autoAlpha: 0 });
+      },
+      onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
+      markers: true
+    });
   }
-}
-
-onMounted(async () => {
-  await nextTick() // Sicherstellen, dass DOM gerendert ist
-
-  // Start des Fade-Out nach kurzer Verzögerung (z.B. 100ms)
-  setTimeout(() => {
-    showOverlay.value = false
-  }, 100) // 100 Millisekunden Verzögerung, um den Transition-Start zu gewährleisten
-
-  // Scroll-Listener hinzufügen
-  window.addEventListener('scroll', onScroll)
-  window.addEventListener('resize', onScroll) // Optional: Überprüfen bei Größenänderung
-})
-
-onBeforeUnmount(() => {
-  // Scroll-Listener entfernen
-  window.removeEventListener('scroll', onScroll)
-  window.removeEventListener('resize', onScroll)
-})
-</script>
-
-<style scoped>
-/* Fade-Out Transition für das Overlay */
-.fade-leave-active {
-  transition: opacity 1.2s ease;
-}
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* Optional: Fade-In Transition (falls benötigt) */
-.fade-enter-active {
-  transition: opacity 1.2s ease;
-}
-.fade-enter-from {
-  opacity: 0;
-}
-.fade-enter-to {
-  opacity: 1;
-}
-
-/* Main content slide-in transition */
-.main-content {
-  opacity: 0;
-  transform: translateY(70px);
-  transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out;
-}
-
-.main-content.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Glatte Transformation für das Bild */
-section[ref="pictureSection"] {
-  transition: transform 0.1s linear;
-}
-</style>
+  </script>
+  
+  <style scoped>
+  /* Container-Stile */
+  .scroll-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Schwarzes Overlay (fixed, kein Platz im Dokumentenfluss) */
+  #black-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: 9999; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Überschrift (pinned) */
+  .pinned-heading-section {
+    position: relative; /* Notwendig für Pinning */
+    margin-top: 10px;
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .pinned-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-align: center;
+    transform-origin: center center; /* Für zentrierte Skalierung */
+    will-change: transform, opacity;  /* Optimierung für Animationen */
+  }
+  
+  /* Wort-Abschnitt (pinned) */
+  .word-section {
+    position: relative; /* Notwendig für Pinning */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .effekt-word1 {
+    font-size: 3rem;
+    margin-bottom: 10rem;
+    transform-origin: center center;
+    will-change: transform, opacity;  /* Optimierung für Animationen */
+    opacity: 0; /* Initial versteckt */
+  }
+  
+  .effekt-word2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    transform-origin: center center;
+    will-change: transform, opacity;  /* Optimierung für Animationen */
+    opacity: 0; 
+  }
+  
+  .effekt-word3 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    transform-origin: center center;
+    will-change: transform, opacity;  /* Optimierung für Animationen */
+    opacity: 0; 
+  }
+  
+  /* Nächste Überschrift */
+  .next-heading-section {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Stile für dauerhaft gepinnte Elemente */
+  .permanently-pinned {
+    /* Zusätzliche Stile können hier hinzugefügt werden */
+    /* Beispiel: Schatten, Rahmen, etc. */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  </style>
+  
