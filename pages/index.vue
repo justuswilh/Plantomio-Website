@@ -33,9 +33,15 @@
         id="word-section"
         class="word-section"
       >
-        <div id="effekt-word1" class="effekt-word1">Wort1</div>
-        <div id="effekt-word2" class="effekt-word2">Wort2</div>
-        <div id="effekt-word3" class="effekt-word3">Wort3</div>
+        <div id="word-section1" class="word-section1">
+          <div id="effekt-word1" class="effekt-word1">Smarthome</div>
+        </div>
+        <div id="word-section2" class="word-section2">
+          <div id="effekt-word2" class="effekt-word2">Trifft</div>
+        </div>
+        <div id="word-section3" class="word-section3">
+          <div id="effekt-word3" class="effekt-word3">Botanik</div>
+        </div>
       </section>
   
       <!-- 5) Nächste Überschrift (normaler Fluss) -->
@@ -98,36 +104,53 @@
   
     // ScrollTrigger für schlagartiges Einblenden von #effekt-word1
     ScrollTrigger.create({
-      trigger: '#effekt-word1',
+      trigger: '#word-section1',
       start: 'top+=50 center',
-      end: 'bottom+=220 center',
+      end: 'bottom+=50 center',
       pin: true,
       onEnter: () => {
               gsap.set('#pinned-heading', { autoAlpha: 0 });
               gsap.set('#effekt-word1', { autoAlpha: 1 });
               },
       onEnterBack: () =>  {
-              gsap.set('#pinned-heading', { autoAlpha: 1 });
-              gsap.set('#effekt-word1', { autoAlpha: 0 });
+              gsap.set('#pinned-heading', { autoAlpha: 0 });
+              gsap.set('#effekt-word1', { autoAlpha: 1 });
               },
       onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
       markers: true
     });
   
     ScrollTrigger.create({
-      trigger: '#effekt-word2',
+      trigger: '#word-section2',
       start: 'top+=50 center',
-      end: 'bottom+=150 center',
+      end: 'bottom+=50 center',
       pin: true,
       onEnter: () => {
         gsap.set('#effekt-word1', { autoAlpha: 0 });
         gsap.set('#effekt-word2', { autoAlpha: 1 });
       },
       onEnterBack: () => {
-        gsap.set('#effekt-word1', { autoAlpha: 1 });
-        gsap.set('#effekt-word2', { autoAlpha: 0 });
+        gsap.set('#effekt-word1', { autoAlpha: 0 });
+        gsap.set('#effekt-word2', { autoAlpha: 1 });
       },
       onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
+      markers: true
+    });
+
+    ScrollTrigger.create({
+      trigger: '#word-section3',
+      start: 'top+=50 center',
+      end: 'bottom+=50 center',
+      pin: true,
+      onEnter: () => {
+        gsap.set('#effekt-word2', { autoAlpha: 0 });
+        gsap.set('#effekt-word3', { autoAlpha: 1 });
+      },
+      onEnterBack: () => {
+        gsap.set('#effekt-word2', { autoAlpha: 0 });
+        gsap.set('#effekt-word3', { autoAlpha: 1 });
+      },
+      onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
       markers: true
     });
   }
@@ -182,28 +205,55 @@
     flex-direction: column;
   }
   
+  .word-section1 {
+    position: relative; /* Notwendig für Pinning */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    transform-origin: center center;
+  }
+
+  .word-section2 {
+    position: relative; /* Notwendig für Pinning */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    transform-origin: center center;
+  }
+
+  .word-section3 {
+    position: relative; /* Notwendig für Pinning */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    transform-origin: center center;
+  }
+
   .effekt-word1 {
     font-size: 3rem;
-    margin-bottom: 10rem;
+    margin-bottom: 4rem;
     transform-origin: center center;
     will-change: transform, opacity;  /* Optimierung für Animationen */
     opacity: 0; /* Initial versteckt */
+    text-transform: uppercase;
   }
   
   .effekt-word2 {
     font-size: 3rem;
-    margin-bottom: 1rem;
+    margin-bottom: 4rem;
     transform-origin: center center;
     will-change: transform, opacity;  /* Optimierung für Animationen */
     opacity: 0; 
+    text-transform: uppercase;
   }
   
   .effekt-word3 {
     font-size: 3rem;
-    margin-bottom: 1rem;
+    margin-bottom: 4rem;
     transform-origin: center center;
     will-change: transform, opacity;  /* Optimierung für Animationen */
     opacity: 0; 
+    text-transform: uppercase;
   }
   
   /* Nächste Überschrift */
@@ -213,13 +263,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
-  
-  /* Stile für dauerhaft gepinnte Elemente */
-  .permanently-pinned {
-    /* Zusätzliche Stile können hier hinzugefügt werden */
-    /* Beispiel: Schatten, Rahmen, etc. */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
   </style>
   
