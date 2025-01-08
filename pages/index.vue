@@ -52,9 +52,9 @@
           <div id="showcase-info1" class="showcase-info1">
             <div id="showcase-info-text1" class="showcase-info-text1">
               <p class="text-4xl pb-6 text-white font-semibold">Zielgenaue<br />Bewässerung</p>
-              <img src="/plantmonitor+plug.png" alt="Showcase Image" class="showcase-image" />
+              <img src="/plantmonitor+plug.png" alt="Showcase Image" class="device-image" />
               <div class="flex flex-col">
-                <p class="text-3xl text-white pb-6 font-medium">Reduziert Sorgen und Wasserbedarf</p>
+                <p class="text-2xl text-white pb-4 font-medium">Reduziert Sorgen und Wasserbedarf</p>
                 <p class="text-2xl text-white font-normal whitespace-normal">Dank Monitoring und intelligenter Steuerung schließt du nicht nur Unterversorgung aus, sondern profitierst auch vom Wasser-Sparpotential einer bedarfsgerechten Tröpfchenbewässerung.</p>
               </div>
             </div>
@@ -62,18 +62,38 @@
           <!-- Rechter Bereich (2/3) -->
           <div class="image-container1">
             <img src="@/public/showcase/4.png" alt="Showcase Image" class="showcase-image" />
-            <table>
-              <tbody>
-                <tr>
-                  <td class="text-xl text-right pb-2 pr-4 font-medium">Monitoring:</td>
-                  <td class="text-xl text-green pb-2 font-medium">Substratfeuchtigkeit</td>
-                </tr>
-                <tr>
-                  <td class="text-xl text-green pr-4 font-medium">Automatisierung:</td>
-                  <td class="text-xl text-green font-medium">Bewässerung</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="flex w-full px-6 gap-4 flex-row">
+              <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
+                <p class="pt-1 font-bold">Monitoring</p>
+                <p class="border-2 rounded-md">Feuchtigkeit im Pflanzsubstrat</p>
+                <div class="flex flex-row invisible gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">Füllstand</p>
+                  <p class="border-2 w-1/2 rounded-md ">Wassertemperatur</p>
+                </div>
+                <div class="flex flex-row invisible gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">EC-Wert</p>
+                  <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
+                </div>
+                <div class="flex flex-row invisible gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">Temperatur</p>
+                  <p class="border-2 w-1/2 rounded-md ">Luftfeuchtigkeit</p>
+                </div>
+                <div class="flex flex-row invisible gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">VPD</p>
+                  <p class="border-2 w-1/2 rounded-md ">Optisch</p>
+                </div>
+              </div>
+              <div class="flex w-2/5 text-center text-lg font-normal gap-1 flex-col-reverse">
+                <p class="pt-1 font-bold">Automatisierung</p>
+                <p class="border-2 rounded-md ">Bewässerung</p>
+                <p class="border-2 invisible rounded-md ">Nährstoffversorgung</p>
+                <div class="flex flex-row invisible gap-1">
+                  <p class="border-2 w-1/2 rounded-md">Wasserbezug</p>
+                  <p class="border-2 w-1/2 rounded-md">Ph-Wert</p>
+                </div>
+                <p class="border-2 rounded-md invisible">Klimamanagement</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -83,31 +103,50 @@
             <div id="showcase-info-text2" class="showcase-info-text2">
               <p class="text-4xl pb-6 text-white font-semibold">Nährstoffversorgung<br />ohne Kompromisse</p>
               <div class="flex flex-col">
-                <p class="text-3xl text-white pb-4 font-medium">Nährstoffcontroller</p>
-                <p class="text-2xl text-white font-normal whitespace-normal">Unser Nährstoffcontroller kann 3 Komponenten eines Düngemittelsystems und 2 Lösungen zur PH-Korrektur infundieren. <br /> Bei verwendung von 2 Controllern können 5 weitere Komponenten verwendet werden.</p>
+                <p class="text-3xl text-white pb-4 font-medium">Tankmonitor</p>
+                <p class="text-2xl text-white font-normal whitespace-normal">Um sichere Automatisierung zu gewährleisten, wird der Nährstofftank zu jeder Zeit durch Radar und Messsonden überwacht.</p>
               </div>
               <div class="flex flex-col">
-                <p class="text-3xl text-white pb-4 font-medium">Tankmonitor</p>
-                <p class="text-2xl text-white font-normal whitespace-normal">Durch Radarmessung wird der Füllstand überwacht.<br /> Im inneren des Nährstofftanks werden Temperatur, Ph-Wert und Ec-Wert erfasst. <br /> Dies ermöglicht einen sicheren, autonomen Betrieb, incl. Frischwasserbezug.</p>
-
+                <p class="text-3xl text-white pb-4 font-medium">Nährstoffcontroller</p>
+                <p class="text-2xl text-white font-normal whitespace-normal">Drei Komponenten eines Düngemittelsystems und Zwei Ph-Korrerkturlösungen werden bei Bedarf automatisch infundiert.</p>
               </div>
             </div>
           </div>
           <!-- Rechter Bereich (2/3) -->
           <div class="image-container2">
             <img src="@/public/showcase/6.png" alt="Showcase Image" class="showcase-image2" />
-            <table>
-                <tbody>
-                  <tr>
-                    <td class="text-xl text-right pb-2 pr-4 font-medium">Monitoring:</td>
-                    <td class="text-xl text-green pb-2 font-medium">Substratfeuchtigkeit, Füllstand, Ph-& EC-Wert, Wassertemperatur</td>
-                  </tr>
-                  <tr>
-                    <td class="text-xl text-green pr-4 font-medium">Automatisierung:</td>
-                    <td class="text-xl text-green font-medium">Bewässerung, Nährstoffmanagement, Ph-Management, Frischwasserbezug</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="flex w-full px-6 gap-4 flex-row">
+              <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
+                <p class="pt-1 font-bold">Monitoring</p>
+                <p class="border-2 rounded-md">Feuchtigkeit im Pflanzsubstrat</p>
+                <div class="flex flex-row gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">Füllstand</p>
+                  <p class="border-2 w-1/2 rounded-md ">Wassertemperatur</p>
+                </div>
+                <div class="flex flex-row gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">EC-Wert</p>
+                  <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
+                </div>
+                <div class="flex flex-row invisible gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">Temperatur</p>
+                  <p class="border-2 w-1/2 rounded-md ">Luftfeuchtigkeit</p>
+                </div>
+                <div class="flex flex-row invisible gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">VPD</p>
+                  <p class="border-2 w-1/2 rounded-md ">Optisch</p>
+                </div>
+              </div>
+              <div class="flex w-2/5 text-center text-lg font-normal gap-1 flex-col-reverse">
+                <p class="pt-1 font-bold">Automatisierung</p>
+                <p class="border-2 rounded-md ">Bewässerung</p>
+                <p class="border-2 rounded-md ">Nährstoffversorgung</p>
+                <div class="flex flex-row gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">Wasserbezug</p>
+                  <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
+                </div>
+                <p class="border-2 rounded-md invisible">Klimamanagement</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -116,39 +155,67 @@
           <div id="showcase-info3" class="showcase-info3">
             <div id="showcase-info-text3" class="showcase-info-text3">
               <p class="text-4xl pb-6 text-white font-semibold">Volle Kontrolle?<br />Kein Problem!</p>
-              <img src="/plantmonitor+plug.png" alt="Showcase Image" class="showcase-image" />
+              <img src="/climatemonitor+plug.png" alt="Showcase Image" class="device-image max-w-sm" />
               <div class="flex flex-col">
-                <p class="text-3xl text-white pb-6 font-medium">Reduziert Sorgen und Wasserbedarf</p>
-                <p class="text-2xl text-white font-normal whitespace-normal">Dank Monitoring und intelligenter Steuerung schließt du nicht nur Unterversorgung aus, sondern profitierst auch vom Wasser-Sparpotential einer bedarfsgerechten Tröpfchenbewässerung.</p>
+                <p class="text-2xl text-white pb-4 font-medium">Ganzjährig bestes Klima</p>
+                <p class="text-2xl text-white font-normal whitespace-normal">Ob Indoor oder im isolierten Gewächshaus, unser System übernimmt die Regulierung des Klimas, abgestimmt auf deine Pflanzen. Unsere SmartPlugs ermöglichen das Einbinden analoger Geräte. Außerdem können smarte Geräte wie Thermostate oder Abluftventilatoren eingebunden werden. </p>
               </div>
             </div>
           </div>
           <!-- Rechter Bereich (2/3) -->
           <div class="image-container3">
             <img src="@/public/showcase/8.png" alt="Showcase Image" class="showcase-image3" />
-            <table>
-                <tbody class="align-text-top">
-                  <tr>
-                    <td class="text-lg text-green pr-4 font-medium">Automatisierung:</td>
-                    <td class="text-lg text-green font-medium">Bewässerung</td>
-                    <td class="text-lg text-green font-medium">Nährstoffmanagement <br /> Ph-Management <br /> Frischwasserbezug</td>
-                    <td class="text-lg text-green font-medium">Klimamanagement</td>
-                  </tr>
-                  <tr>
-                    <td class="text-lg text-right pb-2 pr-4 font-medium">Monitoring:</td>
-                    <td class="text-lg text-green pb-2 align-text-top font-medium">Substratfeuchtigkeit</td>
-                    <td class="text-lg text-green pb-2 align-text-top font-medium">Füllstand <br /> Ph-& EC-Wert <br /> Wassertemperatur</td>
-                    <td class="text-lg text-green pb-2 align-text-top font-medium">Lufttemperatur <br /> Luftfeuchtigkeit <br /> VPD, Optisch</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="flex w-full px-6 gap-4 flex-row">
+              <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
+                <p class="pt-1 font-bold">Monitoring</p>
+                <p class="border-2 rounded-md">Feuchtigkeit im Pflanzsubstrat</p>
+                <div class="flex flex-row gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">Füllstand</p>
+                  <p class="border-2 w-1/2 rounded-md ">Wassertemperatur</p>
+                </div>
+                <div class="flex flex-row gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">EC-Wert</p>
+                  <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
+                </div>
+                <div class="flex flex-row gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">Temperatur</p>
+                  <p class="border-2 w-1/2 rounded-md ">Luftfeuchtigkeit</p>
+                </div>
+                <div class="flex flex-row gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">VPD</p>
+                  <p class="border-2 w-1/2 rounded-md ">Optisch</p>
+                </div>
+              </div>
+              <div class="flex w-2/5 text-center text-lg font-normal gap-1 flex-col-reverse">
+                <p class="pt-1 font-bold">Automatisierung</p>
+                <p class="border-2 rounded-md ">Bewässerung</p>
+                <p class="border-2 rounded-md ">Nährstoffversorgung</p>
+                <div class="flex flex-row gap-1">
+                  <p class="border-2 w-1/2 rounded-md ">Wasserbezug</p>
+                  <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
+                </div>
+                <p class="border-2 rounded-md ">Klimamanagement</p>
+              </div>
+            </div>
           </div>
         </div>
+      </section>
 
+      <section class="flex flex-col h-screen">
+        <p class="text-4xl font-semibold mt-8 mb-12 text-center justify-top">Kleine oder große Pläne?</p> 
+        <div class="flex flex-row">
+          <div class="w-1/2 place-items-center">
+            <image src="/showcase/Small.png" alt="Showcase Small" class="smallShowcase" />
+          </div>
+          <div class="w-1/2">
+            <image src="/showcase/Large.png" alt="Showcase Large" class="largeShowcase" />
+          </div>
+        </div>
       </section>
 
       <section class="flex h-screen items-center justify-center">
-        <p class="text-4xl font-semibold text-center">Weitere Informationen folgen in Kürze!</p>  
+        <p class="text-4xl font-semibold text-center">Weitere Informationen folgen in Kürze!</p>
+          
       </section>
     </div>
   </template>
@@ -484,6 +551,13 @@
   object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
 }
 
+.device-image {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+  margin: 0 auto;
+}
+
 .showcase-info2 {
   flex: 1; /* 1/3 */
   background-color: #68b34b ; /* Hintergrundfarbe nach Wunsch */
@@ -562,6 +636,13 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+}
+
+.smallShowcase, .largeShowcase {
+    max-height: 80vh;
+    width: auto;
+    object-fit: contain;
+    margin: 0 auto;
 }
 
 /* Responsive Verhalten */
