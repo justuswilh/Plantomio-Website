@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <NuxtLayout>
     <NuxtPage />
-  </div>
+  </NuxtLayout>
 </template>
+
+<style>
+@import 'tailwindcss';
+@import '@nuxt/ui';
+</style>

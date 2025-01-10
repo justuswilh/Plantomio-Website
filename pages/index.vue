@@ -31,7 +31,7 @@
       <!-- 4) Wort-Abschnitt (pinned) -->
       <section
         id="word-section"
-        class="word-section z-50"
+        class="word-section text-black z-50"
       >
         <div id="word-section1" class="word-section1">
           <div id="effekt-word1" class="effekt-word1">Smarthome</div>
@@ -61,7 +61,7 @@
           </div>
           <!-- Rechter Bereich (2/3) -->
           <div class="image-container1">
-            <img src="@/public/showcase/4.png" alt="Showcase Image" class="showcase-image" />
+            <img src="/showcase/4.png" alt="Showcase Image" class="showcase-image" />
             <div class="flex w-full px-6 gap-4 flex-row">
               <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
                 <p class="pt-1 font-bold">Monitoring</p>
@@ -114,7 +114,7 @@
           </div>
           <!-- Rechter Bereich (2/3) -->
           <div class="image-container2">
-            <img src="@/public/showcase/6.png" alt="Showcase Image" class="showcase-image2" />
+            <img src="/showcase/6.png" alt="Showcase Image" class="showcase-image2" />
             <div class="flex w-full px-6 gap-4 flex-row">
               <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
                 <p class="pt-1 font-bold">Monitoring</p>
@@ -164,7 +164,7 @@
           </div>
           <!-- Rechter Bereich (2/3) -->
           <div class="image-container3">
-            <img src="@/public/showcase/8.png" alt="Showcase Image" class="showcase-image3" />
+            <img src="/showcase/8.png" alt="Showcase Image" class="showcase-image3" />
             <div class="flex w-full px-6 gap-4 flex-row">
               <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
                 <p class="pt-1 font-bold">Monitoring</p>
@@ -201,8 +201,8 @@
         </div>
       </section>
 
-      <section class="flex flex-col h-screen">
-        <p class="text-4xl font-semibold mt-8 mb-12 text-center justify-top">Kleine oder große Pläne?</p> 
+      <section class="flex flex-col">
+        <p class="text-4xl font-semibold mt-6 mb-12 text-green-700 text-center justify-top">Kleine oder große Pläne?</p> 
         <div class="flex flex-row">
           <div class="w-1/2 place-items-center">
             <image src="/showcase/Small.png" alt="Showcase Small" class="smallShowcase" />
@@ -211,7 +211,74 @@
             <image src="/showcase/Large.png" alt="Showcase Large" class="largeShowcase" />
           </div>
         </div>
+        <p class="text-3xl text-green-700 font-semibold mt-12 mb-16 text-center justify-top">Plantomio ist die ideale, ganzheitliche Smarthomelösung, um deine Pflanzen zu versorgen.</p>         
       </section>
+
+      <section class="flex flex-col h-screen">
+        <div class="flex flex-col bg-secondary text-white">
+          <p class="text-4xl font-semibold mt-6 mb-8 text-center justify-top">Vorteile auf einen Blick</p> 
+        </div>
+        <div class="grid grid-cols-4 mt-12 gap-2 grid-rows-2 rounded-xl grow text-green-700">
+          <div class="flex flex-col">
+            <div class="benefit">
+              <img src="/benefit/1.svg" alt="Benefit 1 Image" class="" />
+            </div>
+            <p class="text-center text-3xl mt-4 font-medium">Hybrides Monitoring</p>
+            <p class="text-center text-2xl mt-1 font-medium">Messung aller relevanten Einflussfaktoren</p>
+          </div>
+          <div class="flex flex-col">
+            <div class="benefit">
+              <img src="/benefit/2.svg" alt="Benefit 2 Image" class="" />
+            </div>
+            <p class="text-center text-3xl mt-4 font-medium">Automatische Versorgung</p>
+            <p class="text-center text-2xl mt-1 font-medium">Modulare Plug and Play Automatisierung</p>
+          </div>
+          <div class="flex flex-col">
+            <div class="benefit">
+              <img src="/benefit/3.svg" alt="Benefit 3 Image" class="" />
+            </div>
+            <p class="text-center text-3xl mt-4 font-medium">Intelligente Gartenassistenz</p>
+            <p class="text-center text-2xl mt-1 font-medium">Ohne Vorwissen erfolgreich anpflanzen und kultivieren</p>
+          </div>
+          <div class="flex flex-col">
+            <div class="benefit">
+              <img src="/benefit/4.svg" alt="Benefit 4 Image" class="" />
+            </div>
+            <p class="text-center text-3xl mt-4 font-medium">Günstige Smarthome-Technik</p>
+            <p class="text-center text-2xl mt-1 font-medium">Geringere Anschaffungskosten als konventionelle Systeme</p>
+          </div>
+          <div class="flex flex-col">
+            <div class="benefit">
+              <img src="/benefit/5.svg" alt="Benefit 5 Image" class="" />
+            </div>
+            <p class="text-center text-3xl mt-4 font-medium">Zeitersparnis</p>
+            <p class="text-center text-2xl mt-1 font-medium">Du entscheidest welche Aufgaben du abgeben möchtest</p>
+          </div>
+          <div class="flex flex-col">
+            <div class="benefit">
+              <img src="/benefit/6.svg" alt="Benefit 6 Image" class="" />
+            </div>
+            <p class="text-center text-3xl mt-4 font-medium">Mehr Ertrag</p>
+            <p class="text-center text-2xl mt-1 font-medium">Egal was du ernten willst, wir machen mehr daraus</p>
+          </div>
+          <div class="flex flex-col">
+            <div class="benefit">
+              <img src="/benefit/7.svg" alt="Benefit 7 Image" class="" />
+            </div>
+            <p class="text-center text-3xl mt-4 font-medium">Versorgung in Abwesenheit</p>
+            <p class="text-center text-2xl mt-1 font-medium">Erfolgreich im Garten, trotz flexiblen Lebensstil</p>
+          </div>
+          <div class="flex flex-col">
+            <div class="benefit">
+              <img src="/benefit/8.svg" alt="Benefit 8 Image" class="" />
+            </div>
+            <p class="text-center text-3xl mt-4 font-medium">Keine Sorgen mehr</p>
+            <p class="text-center text-2xl mt-1 font-medium">Nix ist sicher aber deine Pflanzen sind nah dran</p>
+          </div>
+        </div>
+      </section>
+
+      <Contact />
 
       <section class="flex h-screen items-center justify-center">
         <p class="text-4xl font-semibold text-center">Weitere Informationen folgen in Kürze!</p>
@@ -223,6 +290,7 @@
   <script setup lang="ts">
   import { gsap } from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Contact from '~/components/Contact.vue'
   
   gsap.registerPlugin(ScrollTrigger)
   
@@ -571,6 +639,10 @@
   justify-content: space-between;
 }
 
+.bg-secondary {
+  background-color: #68b34b;
+}
+
 .showcase-info-text2 {
   text-align: center;
   padding-left: 12px;
@@ -639,21 +711,23 @@
 }
 
 .smallShowcase, .largeShowcase {
-    max-height: 80vh;
+    max-height: 75vh;
     width: auto;
     object-fit: contain;
     margin: 0 auto;
+}
+
+.benefit {
+  display: flex;
+  flex-direction: column;
+  margin-left: 30%;
+  margin-right: 30%;
 }
 
 /* Responsive Verhalten */
 @media (max-width: 768px) {
   .showcase-content {
     flex-direction: column;
-  }
-
-  .showcase-info, .image-container {
-    flex: none;
-    width: 100%;
   }
 
   .showcase-info {
