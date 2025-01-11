@@ -1,194 +1,90 @@
 <script setup lang="ts">
-import { useCookie } from 'nuxt/app'
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive } from 'vue'
+import type { FormSubmitEvent } from '#ui/types'
 
-interface FormError {
-  name: string
-  message: string
-}
-
-const state = reactive({
-  username: '',
-  password: '',
-  confirmPassword: '',
+// Initialer Zustand des Formulars
+const form = reactive({
+  newsletter: true,
+  betaProgram: false,
+  name: '',
+  nachname: '',
   email: '',
 })
 
-const errors = ref<FormError[]>([])
-const loading = ref(false)
-const isRegisterMode = ref(false) // Umschalten zwischen Login und Registrierung
+// Formular-Submit-Funktion
+async function onSubmit(event: FormSubmitEvent<typeof form>) {
+  // Hier können Sie die Formularwerte verarbeiten, z.B. an einen Server senden
+  console.log('Formular abgesendet:', { ...form })
 
-const router = useRouter()
-const authToken = useCookie('authToken')
+  // Bestätigung anzeigen
+  alert('Vielen Dank für Ihre Anmeldung zur Closed Beta!')
 
-function validate(state: typeof state): FormError[] {
-  const validationErrors: FormError[] = []
-  if (!state.username) {
-    validationErrors.push({ name: 'username', message: 'Benutzername ist erforderlich.' })
-  }
-  if (!state.password) {
-    validationErrors.push({ name: 'password', message: 'Passwort ist erforderlich.' })
-  }
-  if (isRegisterMode.value) {
-    if (!state.email) {
-      validationErrors.push({ name: 'email', message: 'E-Mail ist erforderlich.' })
-    }
-    if (!state.confirmPassword) {
-      validationErrors.push({ name: 'confirmPassword', message: 'Bestätigungs-Passwort ist erforderlich.' })
-    }
-    if (state.password !== state.confirmPassword) {
-      validationErrors.push({ name: 'confirmPassword', message: 'Passwörter stimmen nicht überein.' })
-    }
-  }
-  return validationErrors
-}
-
-function getErrorMessage(fieldName: string): string | null {
-  const fieldError = errors.value.find(error => error.name === fieldName)
-  return fieldError ? fieldError.message : null
-}
-
-async function handleLogin() {
-  loading.value = true
-  errors.value = []
-
-  const validationErrors = validate(state)
-  if (validationErrors.length > 0) {
-    errors.value = validationErrors
-    loading.value = false
-    return
-  }
-
-  try {
-    if (isRegisterMode.value) {
-      // Benutzer erstellen
-      await createUser(state.username, state.password, state.confirmPassword, state.email)
-      console.log('Benutzer erfolgreich angelegt.')
-
-      // Benutzer automatisch einloggen
-      await login(state.username, state.password)
-      const token = authToken.value
-      if (token) {
-        console.log('Login erfolgreich, Token gespeichert:', token)
-      }
-
-      // Weiterleitung nach erfolgreichem Login
-      router.push('/plantsOverview')
-    }
-    else {
-      // Bestehenden Benutzer einloggen
-      await login(state.username, state.password)
-      const token = authToken.value
-      if (token) {
-        console.log('Login erfolgreich, Token gespeichert:', token)
-      }
-      router.push('/plantsOverview')
-    }
-  }
-  catch (err: any) {
-    errors.value.push({ name: 'general', message: err.message || 'Fehler beim Prozess. Bitte versuchen Sie es erneut.' })
-  }
-  finally {
-    loading.value = false
-  }
+  // Formular zurücksetzen
+  form.newsletter = true
+  form.betaProgram = false
+  form.name = ''
+  form.nachname = ''
+  form.email = ''
 }
 </script>
 
 <template>
-  <div class="bg-white flex items-center flex-col grow">
-    <div class="form-container">
-      <div class="bg-green-500 text-white text-center rounded-lg mb-2 shadow-md">
-        <h2 class="text-xl font-bold">
-          {{ isRegisterMode ? 'Benutzer anlegen' : 'Login' }}
-        </h2>
-      </div>
-
-      <div class="p-4 text-black">
-        <UForm :validate="validate" :state="state" class="mb-2" @submit.prevent="handleLogin">
-          <UFormField label="Benutzername" name="username">
-            <UInput
-              v-model="state.username"
-              placeholder="Geben Sie Ihren Benutzernamen ein"
-              required
-              :class="{ 'border-red-500': getErrorMessage('username') }"
-            />
-            <div v-if="getErrorMessage('username')" class="field-error">
-              {{ getErrorMessage('username') }}
-            </div>
-          </UFormField>
-
-          <UFormField label="Passwort" name="password">
-            <UInput
-              v-model="state.password"
-              type="password"
-              placeholder="Geben Sie Ihr Passwort ein"
-              required
-              :class="{ 'border-red-500': getErrorMessage('password') }"
-            />
-            <div v-if="getErrorMessage('password')" class="field-error">
-              {{ getErrorMessage('password') }}
-            </div>
-          </UFormField>
-
-          <UFormField v-if="isRegisterMode" label="Passwort bestätigen" name="confirmPassword">
-            <UInput
-              v-model="state.confirmPassword"
-              type="password"
-              placeholder="Bestätigen Sie Ihr Passwort"
-              required
-              :class="{ 'border-red-500': getErrorMessage('confirmPassword') }"
-            />
-            <div v-if="getErrorMessage('confirmPassword')" class="field-error">
-              {{ getErrorMessage('confirmPassword') }}
-            </div>
-          </UFormField>
-
-          <UFormField v-if="isRegisterMode" label="E-Mail" name="email">
-            <UInput
-              v-model="state.email"
-              type="email"
-              placeholder="Geben Sie Ihre E-Mail ein"
-              required
-              :class="{ 'border-red-500': getErrorMessage('email') }"
-            />
-            <div v-if="getErrorMessage('email')" class="field-error">
-              {{ getErrorMessage('email') }}
-            </div>
-          </UFormField>
-
-          <UButton type="submit" class="mt-4" :disabled="loading" block>
-            {{ loading ? 'Verarbeiten...' : (isRegisterMode ? 'Benutzer anlegen' : 'Login') }}
-          </UButton>
-        </UForm>
-
-        <div v-if="getErrorMessage('general')" class="error">
-          {{ getErrorMessage('general') }}
-        </div>
-      </div>
+  <div class="container flex flex-col mx-auto overflow-hidden rounded-xl border-1 border-green-600 m-6 justify-center">
+    <div class="flex flex-col bg-secondary text-white">
+      <p class="text-4xl font-semibold mt-3 mb-4 text-center justify-top"> Newsletter und Betha Phase </p>
     </div>
-    <UButton class="mt-4 w-48" block @click="isRegisterMode = !isRegisterMode">
-      {{ isRegisterMode ? 'Zurück zum Login' : 'Benutzer anlegen' }}
-    </UButton>
+    <Progress class="mt-10 mb-2" />
+    <p class="text-xl leading-loose font-semibold mt-4 mb-4 text-center justify-top">
+      Unsere Betha Phase hat begonnen! <br /> Interessierte können bereits jetzt die Vorteile smarter Pflanzenversorgung erfahren. <br /> Unser Newsletter hält dich auf dem Laufenden ohne zu stressen. Wir schreiben dir nur bei relevanten Fortschritten, versprochen!
+    </p>
+
+    <div class="flex flex-col justify-center mb-6 mx-auto">
+      <UForm :state="form" @submit="onSubmit">
+        <div class="flex flex-row gap-6 justify-center">
+          <!-- Checkboxes -->
+          <UFormField name="newsletter">
+            <UCheckbox v-model="form.newsletter" label="Newsletter abonieren" size="xl" />
+          </UFormField>
+
+          <UFormField name="betaProgram">
+            <UCheckbox v-model="form.betaProgram" label="Interesse am Beta-Programm" size="xl" />
+          </UFormField>
+        </div>
+
+        <div class="flex flex-row gap-6 mt-6 justify-center">
+          <!-- Name -->
+          <UFormField label="Name" name="name" size="xl" required>
+            <UInput v-model="form.name" placeholder="Ihr Vorname" />
+          </UFormField>
+
+          <!-- Nachname -->
+          <UFormField label="Nachname" size="xl" name="nachname">
+            <UInput v-model="form.nachname" placeholder="Ihr Nachname" />
+          </UFormField>
+
+          <!-- E-Mail -->
+          <UFormField label="E-Mail" name="email" size="xl" required>
+            <UInput v-model="form.email" type="email" placeholder="Ihre E-Mail-Adresse" />
+          </UFormField>
+        </div>
+        <div class="flex justify-center mt-8">
+          <!-- Submit Button -->
+          <UButton type="submit" color="primary" size="xl">
+            Absenden
+          </UButton>
+        </div>
+        <p class="text-center mt-10"> Mit dem Absenden des Formulars erkläre ich mich mit den Datenschutzbestimmungen einverstanden.</p>
+      </UForm>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.form-container {
-  margin: 5rem auto;
-  border: 1px solid #22c55e;
-  border-radius: 8px;
+.container {
+  width: 80%;
 }
 
-.field-error {
-  color: red;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-.error {
-  color: red;
-  margin-top: 1rem;
-  text-align: center;
+.bg-secondary {
+  background-color: #68b34b;
 }
 </style>

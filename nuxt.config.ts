@@ -22,10 +22,6 @@ export default defineNuxtConfig({
     preference: 'light',
   },
 
-  devtools: {
-    enabled: true,
-  },
-
   eslint: {
     config: {
       standalone: false,
