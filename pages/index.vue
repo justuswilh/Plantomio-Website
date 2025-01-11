@@ -377,62 +377,62 @@ onMounted(() => {
       <div class="flex flex-col bg-secondary text-white">
         <p class="text-4xl font-semibold mt-6 mb-8 text-center justify-top">Vorteile auf einen Blick</p> 
       </div>
-      <div class="grid grid-cols-4 mt-12 gap-2 grid-rows-2 rounded-xl grow text-green-700">
+      <div class="grid grid-cols-4 mt-12 gap-4 grid-rows-2 rounded-xl grow mx-8 text-green-700">
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/1.svg" alt="Benefit 1 Image" class="" />
           </div>
           <p class="text-center text-3xl mt-4 font-medium">Hybrides Monitoring</p>
-          <p class="text-center text-2xl mt-1 font-medium">Messung aller relevanten Einflussfaktoren</p>
+          <p class="text-center text-xl mt-1 font-medium">Messung und Auswertung aller relevanten Einflussfaktoren</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/2.svg" alt="Benefit 2 Image" class="" />
           </div>
           <p class="text-center text-3xl mt-4 font-medium">Automatische Versorgung</p>
-          <p class="text-center text-2xl mt-1 font-medium">Modulare Plug and Play Automatisierung</p>
+          <p class="text-center text-xl mt-1 font-medium">Kabellose, modulare Plug and Play Automatisierung</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/3.svg" alt="Benefit 3 Image" class="" />
           </div>
           <p class="text-center text-3xl mt-4 font-medium">Intelligente Gartenassistenz</p>
-          <p class="text-center text-2xl mt-1 font-medium">Ohne Vorwissen erfolgreich anpflanzen und kultivieren</p>
+          <p class="text-center text-xl mt-1 font-medium">Interaktiv angeleitet, ohne Vorwissen, erfolgreich anpflanzen und kultivieren</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/4.svg" alt="Benefit 4 Image" class="" />
           </div>
           <p class="text-center text-3xl mt-4 font-medium">Günstige Smarthome-Technik</p>
-          <p class="text-center text-2xl mt-1 font-medium">Geringere Anschaffungskosten als konventionelle Systeme</p>
+          <p class="text-center text-xl mt-1 font-medium">Geringere Anschaffungskosten als konventionelle Systeme</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/5.svg" alt="Benefit 5 Image" class="" />
           </div>
           <p class="text-center text-3xl mt-4 font-medium">Zeitersparnis</p>
-          <p class="text-center text-2xl mt-1 font-medium">Du entscheidest welche Aufgaben du abgeben möchtest</p>
+          <p class="text-center text-xl mt-1 font-medium">Weniger Zeit und Mühe, dafür mehr Zeit zum genießen</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/6.svg" alt="Benefit 6 Image" class="" />
           </div>
           <p class="text-center text-3xl mt-4 font-medium">Mehr Ertrag</p>
-          <p class="text-center text-2xl mt-1 font-medium">Egal was du ernten willst, wir machen mehr daraus</p>
+          <p class="text-center text-xl mt-1 font-medium">Egal was du ernten willst, wir machen einfach mehr daraus</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/7.svg" alt="Benefit 7 Image" class="" />
           </div>
           <p class="text-center text-3xl mt-4 font-medium">Versorgung in Abwesenheit</p>
-          <p class="text-center text-2xl mt-1 font-medium">Erfolgreich im Garten, trotz flexiblen Lebensstil</p>
+          <p class="text-center text-xl mt-1 font-medium">Erfolgreich im Garten, trotz flexiblen Lebensstil</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/8.svg" alt="Benefit 8 Image" class="" />
           </div>
           <p class="text-center text-3xl mt-4 font-medium">Keine Sorgen mehr</p>
-          <p class="text-center text-2xl mt-1 font-medium">Nix ist sicher aber deine Pflanzen sind nah dran</p>
+          <p class="text-center text-xl mt-1 font-medium">Nix ist sicher aber deine Pflanzen sind nah dran</p>
         </div>
       </div>
     </section>

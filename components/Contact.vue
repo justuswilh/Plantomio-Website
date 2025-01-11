@@ -35,7 +35,7 @@ async function onSubmit(event: FormSubmitEvent<typeof form>) {
     </div>
     <Progress class="mt-10 mb-2" />
     <p class="text-xl leading-loose font-semibold mt-4 mb-4 text-center justify-top">
-      Unsere Betha Phase hat begonnen! <br /> Interessierte können bereits jetzt die Vorteile smarter Pflanzenversorgung erfahren. <br /> Unser Newsletter hält dich auf dem Laufenden ohne zu stressen. Wir schreiben dir nur bei relevanten Fortschritten, versprochen!
+      Unsere Betha Phase hat begonnen! <br /> Interessierte können bereits jetzt die Vorteile smarter Pflanzenversorgung erfahren. <br /> Unser Newsletter hält dich auf dem Laufenden ohne zu stressen. <br /> Wir schreiben dir nur bei relevanten Fortschritten.
     </p>
 
     <div class="flex flex-col justify-center mb-6 mx-auto">
@@ -67,13 +67,13 @@ async function onSubmit(event: FormSubmitEvent<typeof form>) {
             <UInput v-model="form.email" type="email" placeholder="Ihre E-Mail-Adresse" />
           </UFormField>
         </div>
-        <div class="flex justify-center mt-8">
+        <div class="flex justify-center mt-10">
           <!-- Submit Button -->
           <UButton type="submit" color="primary" size="xl">
             Absenden
           </UButton>
         </div>
-        <p class="text-center mt-10"> Mit dem Absenden des Formulars erkläre ich mich mit den Datenschutzbestimmungen einverstanden.</p>
+        <p class="text-center mt-8"> Mit dem Absenden des Formulars erkläre ich mich mit den Datenschutzbestimmungen einverstanden.</p>
       </UForm>
     </div>
   </div>
