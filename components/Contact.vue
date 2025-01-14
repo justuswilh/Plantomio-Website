@@ -1,9 +1,22 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
+import * as v from 'valibot'
 import type { FormSubmitEvent } from '#ui/types'
 
-// Initialer Zustand des Formulars
-const form = reactive({
+// Definiere das Validierungsschema
+const schema = v.object({
+  newsletter: v.boolean(),
+  betaProgram: v.boolean(),
+  name: v.pipe(v.string(), v.minLength(1, 'Name ist erforderlich')),
+  nachname: v.pipe(v.string(), v.minLength(1, 'Nachname ist erforderlich')),
+  email: v.pipe(v.string(), v.email('Ungültige E-Mail-Adresse')),
+})
+
+// Inferenz des Schematyps
+type Schema = v.InferOutput<typeof schema>
+
+// Reaktiver Zustand des Formulars
+const form = reactive<Schema>({
   newsletter: true,
   betaProgram: false,
   name: '',
@@ -11,39 +24,79 @@ const form = reactive({
   email: '',
 })
 
-// Formular-Submit-Funktion
-async function onSubmit(event: FormSubmitEvent<typeof form>) {
-  // Hier können Sie die Formularwerte verarbeiten, z.B. an einen Server senden
-  console.log('Formular abgesendet:', { ...form })
+// Reaktiver Zustand für Validierungsfehler
+const errors = reactive<Record<keyof Schema, string | null>>({
+  newsletter: null,
+  betaProgram: null,
+  name: null,
+  nachname: null,
+  email: null,
+})
 
-  // Bestätigung anzeigen
-  alert('Vielen Dank für Ihre Anmeldung zur Closed Beta!')
+// Formular-Submit-Funktion mit Validierung
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+  try {
+    // Debugging: Überprüfen Sie die empfangenen Daten
+    console.log('Empfangene Daten:', event.data)
 
-  // Formular zurücksetzen
-  form.newsletter = true
-  form.betaProgram = false
-  form.name = ''
-  form.nachname = ''
-  form.email = ''
+    // Zusätzliche Überprüfung der E-Mail-Domain
+    const emailResponse = await fetch('/api/validate-email', { // Nutze relative URL
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: form.email }),
+    })
+
+    const emailResult = await emailResponse.json()
+
+    if (!emailResponse.ok) {
+      // Setze den Fehler für das E-Mail-Feld
+      errors.email = emailResult.message || 'Ungültige E-Mail-Domain.'
+      return
+    }
+
+    // Wenn Validierung erfolgreich ist, setze alle Fehler zurück
+    Object.keys(errors).forEach(key => {
+      errors[key as keyof Schema] = null
+    })
+
+    // Hier kannst du die validierten Daten weiterverarbeiten, z.B. an einen Server senden
+    console.log('Formular abgesendet:', form.name, form.nachname, form.email)
+
+    // Bestätigung anzeigen
+    alert('Vielen Dank für Ihre Anmeldung zur Closed Beta!')
+
+    // Formular zurücksetzen
+    form.newsletter = true
+    form.betaProgram = false
+    form.name = ''
+    form.nachname = ''
+    form.email = ''
+  } catch (error) {
+    console.error('Ein unerwarteter Fehler ist aufgetreten:', error)
+    alert('Ein Fehler ist aufgetreten. Bitte versuche es später erneut.')
+  }
 }
 </script>
 
 <template>
   <div class="container flex flex-col mx-auto overflow-hidden rounded-xl border-1 border-green-600 m-6 justify-center">
     <div class="flex flex-col bg-secondary text-white">
-      <p class="text-4xl font-semibold mt-3 mb-4 text-center justify-top"> Newsletter und Betha Phase </p>
+      <p class="text-4xl font-semibold mt-3 mb-4 text-center justify-top"> Newsletter und Beta Phase </p>
     </div>
     <Progress class="mt-10 mb-2" />
     <p class="text-xl leading-loose font-semibold mt-4 mb-4 text-center justify-top">
-      Unsere Betha Phase hat begonnen! <br /> Interessierte können bereits jetzt die Vorteile smarter Pflanzenversorgung erfahren. <br /> Unser Newsletter hält dich auf dem Laufenden ohne zu stressen. <br /> Wir schreiben dir nur bei relevanten Fortschritten.
+      Unsere Beta Phase hat begonnen! <br /> Interessierte können bereits jetzt die Vorteile smarter Pflanzenversorgung erfahren. <br /> Unser Newsletter hält dich auf dem Laufenden ohne zu stressen. <br /> Wir schreiben dir nur bei relevanten Fortschritten.
     </p>
 
     <div class="flex flex-col justify-center mb-6 mx-auto">
-      <UForm :state="form" @submit="onSubmit">
+      <!-- Entfernen Sie die :schema-Bindung -->
+      <UForm :schema="v.safeParser(schema)" :state="form" class="space-y-4" @submit="onSubmit">
         <div class="flex flex-row gap-6 justify-center">
           <!-- Checkboxes -->
           <UFormField name="newsletter">
-            <UCheckbox v-model="form.newsletter" label="Newsletter abonieren" size="xl" />
+            <UCheckbox v-model="form.newsletter" label="Newsletter abonnieren" size="xl" />
           </UFormField>
 
           <UFormField name="betaProgram">
@@ -55,16 +108,22 @@ async function onSubmit(event: FormSubmitEvent<typeof form>) {
           <!-- Name -->
           <UFormField label="Name" name="name" size="xl" required>
             <UInput v-model="form.name" placeholder="Ihr Vorname" />
+            <!-- Fehleranzeige für Name -->
+            <p v-if="errors.name" class="text-red-500 text-sm mt-1">{{ errors.name }}</p>
           </UFormField>
 
           <!-- Nachname -->
-          <UFormField label="Nachname" size="xl" name="nachname">
+          <UFormField label="Nachname" size="xl" name="nachname" required>
             <UInput v-model="form.nachname" placeholder="Ihr Nachname" />
+            <!-- Fehleranzeige für Nachname -->
+            <p v-if="errors.nachname" class="text-red-500 text-sm mt-1">{{ errors.nachname }}</p>
           </UFormField>
 
           <!-- E-Mail -->
           <UFormField label="E-Mail" name="email" size="xl" required>
             <UInput v-model="form.email" type="email" placeholder="Ihre E-Mail-Adresse" />
+            <!-- Fehleranzeige für E-Mail -->
+            <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
           </UFormField>
         </div>
         <div class="flex justify-center mt-10">
@@ -86,5 +145,10 @@ async function onSubmit(event: FormSubmitEvent<typeof form>) {
 
 .bg-secondary {
   background-color: #68b34b;
+}
+
+/* Styling für Fehlernachrichten */
+.text-red-500 {
+  color: #f56565;
 }
 </style>

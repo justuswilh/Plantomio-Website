@@ -2,6 +2,7 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Contact from '~/components/Contact.vue'
+import ShowcaseCarousel from '~/components/ShowcaseCarousel.vue'
 
 gsap.registerPlugin(ScrollTrigger)
 onMounted(() => {
@@ -43,7 +44,7 @@ onMounted(() => {
       { scale: 1.2, duration: 0.2 }
     )
 
-    // ScrollTrigger für schlagartiges Einblenden von #effekt-word1
+    // ScrollTrigger für #effekt-word1
     ScrollTrigger.create({
       trigger: '#word-section1',
       start: 'top+=50 center',
@@ -60,6 +61,7 @@ onMounted(() => {
       onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
     });
 
+    // ScrollTrigger für #effekt-word2
     ScrollTrigger.create({
       trigger: '#word-section2',
       start: 'top+=50 center',
@@ -76,6 +78,7 @@ onMounted(() => {
       onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
     });
 
+    // ScrollTrigger für #effekt-word3
     ScrollTrigger.create({
       trigger: '#word-section3',
       start: 'top+=50 center',
@@ -92,68 +95,126 @@ onMounted(() => {
       onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
     });
 
+    // Ausklappen von #showcase-info1
     ScrollTrigger.create({
       trigger: '#showcase-section',
       start: 'top+=200 center',
       end: 'bottom+=50 center',
       onEnter: () => {
         gsap.to('#showcase-info1', {
-          x: 0, // Entfernt die translateX(-200px) Transformation
-          duration: 1, // Dauer der Animation in Sekunden
-          ease: 'power2.out' // Easing-Funktion für eine sanfte Animation
+          x: 0, 
+          duration: 1, 
+          ease: 'power2.out' 
         });
       },
       onLeaveBack: () => {
         gsap.to('#showcase-info1', {
-          x: -800, // Setzt die translateX zurück
+          x: -800, 
           duration: 1,
           ease: 'power2.in'
         });
       }
     });
 
+    // #effekt-word3 schneller bewegen
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: '#showcase-section',
+        start: 'top+=300 center',
+        end: 'top+=600 center',
+        scrub: true,
+      }
+    })
+    .fromTo(
+      '#effekt-word3',
+      { y: 0 },
+      { y: -200, duration: 1 }
+    )
+
+    // Showcase-Content 1 pinnen 
     ScrollTrigger.create({
-      trigger: '#showcase-content1',
-      start: 'top top', // Startpunkt: Oberkante von #showcase-info1 erreicht die Oberkante des Viewports
-      end: 'bottom+=100 center', // Dauer des Pinning, kann nach Bedarf angepasst werden
-      pin: true, // Das Element, das gepinnt werden soll
-      pinSpacing: false, // Entfernt den zusätzlichen Platz, der durch das Pinnen entstehen würde
-      scrub: true, // Optional: Ermöglicht eine sanfte Pinning-Animation
-      anticipatePin: 1, // Optional: Verbessert die Pinning-Performance
+      trigger: '#showcase-section',
+      start: 'top top', 
+      end: 'bottom top', 
+      pin: '#showcase-content1',
+      pinSpacing: false,
+      anticipatePin: 1,
   });
 
+    // Showcase-Content 2 pinnen und einblenden
   ScrollTrigger.create({
       trigger: '#showcase-content2',
       start: 'top top',
-      end: 'bottom+=100 center',
-      pin: true,
+      pin: '#showcase-content2',
       pinSpacing: false,
       onEnter: () => {
-        gsap.set('#showcase-content1', { autoAlpha: 0 });
-        gsap.set('#showcase-content2', { autoAlpha: 1 });
+        gsap.to('#showcase-info2', {
+          x: 0, // Entfernt die translateX(-200px) Transformation
+          duration: 1, // Dauer der Animation in Sekunden
+          ease: 'power2.out' // Easing-Funktion für eine sanfte Animation
+        });
+        gsap.to('#step2', {
+          autoAlpha: 1,
+          duration: 1,
+          ease: 'power2.out'
+        });
       },
       onLeaveBack: () => {
-        gsap.set('#showcase-content1', { autoAlpha: 1 });
-        gsap.set('#showcase-content2', { autoAlpha: 0 });
+        gsap.to('#showcase-info2', {
+          x: -800, // Setzt die translateX zurück
+          duration: 0.6,
+          ease: 'power2.in'
+        });
+        gsap.to('#step2', {
+          autoAlpha: 0,
+          duration: 0.6,
+          ease: 'power2.in'
+        });
       },
     });
 
-    ScrollTrigger.create({
+    // Showcase-Content 1 pinnen 
+  ScrollTrigger.create({
+      trigger: '#showcase-content3',
+      start: 'top top', 
+      end: 'bottom top', 
+      pin: '#showcase-content2',
+      pinSpacing: false,
+  });
+
+
+      // Showcase-Content 3 pinnen und einblenden
+  ScrollTrigger.create({
       trigger: '#showcase-content3',
       start: 'top top',
-      end: 'bottom+=50 center',
+      end: 'bottom top',
       pin: true,
       pinSpacing: false,
       onEnter: () => {
-        gsap.set('#showcase-content2', { autoAlpha: 0 });
-        gsap.set('#showcase-content3', { autoAlpha: 1 });
+        gsap.to('#showcase-info3', {
+          x: 0, // Entfernt die translateX(-200px) Transformation
+          duration: 1, // Dauer der Animation in Sekunden
+          ease: 'power2.out' // Easing-Funktion für eine sanfte Animation
+        });
+        gsap.to('#step3', {
+          autoAlpha: 1,
+          duration: 1,
+          ease: 'power2.out'
+        });
       },
       onLeaveBack: () => {
-        gsap.set('#showcase-content2', { autoAlpha: 1 });
-        gsap.set('#showcase-content3', { autoAlpha: 0 });
+        gsap.to('#showcase-info3', {
+          x: -800, // Setzt die translateX zurück
+          duration: 0.6,
+          ease: 'power2.in'
+        });
+        gsap.to('#step3', {
+          autoAlpha: 0,
+          duration: 0.6,
+          ease: 'power2.in'
+        });
       },
     });
-
   }
 </script>
 
@@ -203,77 +264,77 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- 5) Nächste Showcase-Section -->
+    <!-- 5) Showcase-Section -->
     <section id="showcase-section" class="showcase-section">
-
-      <div id="showcase-content1" class="showcase-content1">
+      <div id="showcase-content1" class="showcase-content">
         <!-- Linker Bereich (1/3) -->
-        <div id="showcase-info1" class="showcase-info1">
-          <div id="showcase-info-text1" class="showcase-info-text1">
+        <div id="showcase-info1" class="showcase-info">
+          <div id="showcase-info-text1" class="showcase-info-text">
             <p class="text-4xl pb-6 text-white font-semibold">Zielgenaue<br />Bewässerung</p>
             <img src="/plantmonitor+plug.png" alt="Showcase Image" class="device-image" />
             <div class="flex flex-col">
-              <p class="text-2xl text-white pb-4 font-medium">Reduziert Sorgen und Wasserbedarf</p>
+              <p class="text-2xl text-white pb-4 font-semibold">Reduziert Sorgen und Wasserbedarf</p>
               <p class="text-2xl text-white font-normal whitespace-normal">Dank Monitoring und intelligenter Steuerung schließt du nicht nur Unterversorgung aus, sondern profitierst auch vom Wasser-Sparpotential einer bedarfsgerechten Tröpfchenbewässerung.</p>
             </div>
           </div>
         </div>
         <!-- Rechter Bereich (2/3) -->
-        <div class="image-container1">
-          <img src="/showcase/4.png" alt="Showcase Image" class="showcase-image" />
-          <div class="flex w-full px-6 gap-4 flex-row">
-            <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
-              <p class="pt-1 font-bold">Monitoring</p>
-              <p class="border-2 rounded-md">Feuchtigkeit im Pflanzsubstrat</p>
-              <div class="flex flex-row invisible gap-1">
-                <p class="border-2 w-1/2 rounded-md ">Füllstand</p>
-                <p class="border-2 w-1/2 rounded-md ">Wassertemperatur</p>
-              </div>
-              <div class="flex flex-row invisible gap-1">
-                <p class="border-2 w-1/2 rounded-md ">EC-Wert</p>
-                <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
-              </div>
-              <div class="flex flex-row invisible gap-1">
-                <p class="border-2 w-1/2 rounded-md ">Temperatur</p>
-                <p class="border-2 w-1/2 rounded-md ">Luftfeuchtigkeit</p>
-              </div>
-              <div class="flex flex-row invisible gap-1">
-                <p class="border-2 w-1/2 rounded-md ">VPD</p>
-                <p class="border-2 w-1/2 rounded-md ">Optisch</p>
+        <div class="image-container">
+          <img src="/showcase/1.png" alt="Showcase Image" class="showcase-image absolute" />
+          <img src="/showcase/2.png" alt="Showcase Image" id="step2" class="showcase-image absolute invisible" />
+          <img src="/showcase/3.png" alt="Showcase Image" id="step3" class="showcase-image absolute invisible" />
+          <div class="flex w-full gap-3 flex-col mb-4 mt-auto">
+            <div class="flex w-full text-lg font-semibold flex-col">
+              <p class="font-normal uppercase py-1 tracking-widest px-10">Monitoring</p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
+                <div class="flex flex-col w-1/3">
+                  <p class="">Feuchtigkeit im Pflanzsubstrat</p>
+                </div>
+                <div id="step2" class="flex flex-col invisible w-1/3">
+                  <p>Füllstand, Wassertemperatur, EC-Wert, Ph-Wert</p>
+                </div>
+                <div id="step3" class="flex flex-col invisible w-1/3">
+                  <p>Temperatur, Luftfeuchtigkeit, Optisch, VPD (Dampfdruckdefizit)</p>
+                </div>
               </div>
             </div>
-            <div class="flex w-2/5 text-center text-lg font-normal gap-1 flex-col-reverse">
-              <p class="pt-1 font-bold">Automatisierung</p>
-              <p class="border-2 rounded-md ">Bewässerung</p>
-              <p class="border-2 invisible rounded-md ">Nährstoffversorgung</p>
-              <div class="flex flex-row invisible gap-1">
-                <p class="border-2 w-1/2 rounded-md">Wasserbezug</p>
-                <p class="border-2 w-1/2 rounded-md">Ph-Wert</p>
+            <div class="flexd text-lg w-full font-semibold flex-col">
+              <p class="font-normal tracking-widest py-1 uppercase px-10">Automatisierung</p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
+                <div class="flex flex-col w-1/3">
+                  <p class="">Bewässerung</p>
+                </div>
+                <div id="step2" class="flex flex-col w-1/3 invisible">
+                  <p>Nährstoffversorgung, Ph-Management, Wasserbezug</p>
+                </div>
+                <div id="step3" class="flex flex-col w-1/3 invisible">
+                  <p>Klimamanagement</p>
+                </div>
               </div>
-              <p class="border-2 rounded-md invisible">Klimamanagement</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div id="showcase-content2" class="showcase-content2">
+      <!-- Content2 -->
+      <div id="showcase-content2" class="showcase-content">
         <!-- Linker Bereich (1/3) -->
-        <div id="showcase-info2" class="showcase-info2">
-          <div id="showcase-info-text2" class="showcase-info-text2">
+        <div id="showcase-info2" class="showcase-info">
+          <div id="showcase-info-text2" class="showcase-info-text">
             <p class="text-4xl pb-6 text-white font-semibold">Nährstoffversorgung<br />ohne Kompromisse</p>
             <div class="flex flex-col">
-              <p class="text-3xl text-white pb-4 font-medium">Tankmonitor</p>
+              <p class="text-2xl text-white pb-4 font-semibold">Tankmonitor</p>
               <p class="text-2xl text-white font-normal whitespace-normal">Um sichere Automatisierung zu gewährleisten, wird der Nährstofftank zu jeder Zeit durch Radar und Messsonden überwacht.</p>
             </div>
             <div class="flex flex-col">
-              <p class="text-3xl text-white pb-4 font-medium">Nährstoffcontroller</p>
+              <p class="text-2xl text-white pb-4 font-semibold">Nährstoffcontroller</p>
               <p class="text-2xl text-white font-normal whitespace-normal">Drei Komponenten eines Düngemittelsystems und Zwei Ph-Korrerkturlösungen werden bei Bedarf automatisch infundiert.</p>
             </div>
           </div>
         </div>
         <!-- Rechter Bereich (2/3) -->
-        <div class="image-container2">
-          <img src="/showcase/6.png" alt="Showcase Image" class="showcase-image2" />
+        <div class="image-container invisible">
+          <img src="/showcase/2.png" alt="Showcase Image" class="showcase-image" />
           <div class="flex w-full px-6 gap-4 flex-row">
             <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
               <p class="pt-1 font-bold">Monitoring</p>
@@ -309,21 +370,22 @@ onMounted(() => {
         </div>
       </div>
 
-      <div id="showcase-content3" class="showcase-content3">
+      <!-- Content3 -->
+      <div id="showcase-content3" class="showcase-content">
         <!-- Linker Bereich (1/3) -->
-        <div id="showcase-info3" class="showcase-info3">
-          <div id="showcase-info-text3" class="showcase-info-text3">
+        <div id="showcase-info3" class="showcase-info">
+          <div id="showcase-info-text3" class="showcase-info-text">
             <p class="text-4xl pb-6 text-white font-semibold">Volle Kontrolle?<br />Kein Problem!</p>
             <img src="/climatemonitor+plug.png" alt="Showcase Image" class="device-image max-w-sm" />
             <div class="flex flex-col">
-              <p class="text-2xl text-white pb-4 font-medium">Ganzjährig bestes Klima</p>
+              <p class="text-2xl text-white pb-4 font-semibold">Ganzjährig bestes Klima</p>
               <p class="text-2xl text-white font-normal whitespace-normal">Ob Indoor oder im isolierten Gewächshaus, unser System übernimmt die Regulierung des Klimas, abgestimmt auf deine Pflanzen. Unsere SmartPlugs ermöglichen das Einbinden analoger Geräte. Außerdem können smarte Geräte wie Thermostate oder Abluftventilatoren eingebunden werden. </p>
             </div>
           </div>
         </div>
         <!-- Rechter Bereich (2/3) -->
-        <div class="image-container3">
-          <img src="/showcase/8.png" alt="Showcase Image" class="showcase-image3" />
+        <div class="image-container invisible">
+          <img src="/showcase/3.png" alt="Showcase Image" class="showcase-image" />
           <div class="flex w-full px-6 gap-4 flex-row">
             <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
               <p class="pt-1 font-bold">Monitoring</p>
@@ -360,79 +422,70 @@ onMounted(() => {
       </div>
     </section>
 
-    <section class="flex flex-col">
-      <p class="text-4xl font-semibold mt-6 mb-12 text-green-700 text-center justify-top">Kleine oder große Pläne?</p> 
-      <div class="flex flex-row">
-        <div class="w-1/2 place-items-center">
-          <image src="/showcase/Small.png" alt="Showcase Small" class="smallShowcase" />
-        </div>
-        <div class="w-1/2">
-          <image src="/showcase/Large.png" alt="Showcase Large" class="largeShowcase" />
-        </div>
-      </div>
-      <p class="text-3xl text-green-700 font-semibold mt-12 mb-16 text-center justify-top">Plantomio ist die ideale, ganzheitliche Smarthomelösung, um deine Pflanzen zu versorgen.</p>         
+    <section>
+      <ShowcaseCarousel />
     </section>
 
     <section class="flex flex-col h-screen">
       <div class="flex flex-col bg-secondary text-white">
         <p class="text-4xl font-semibold mt-6 mb-8 text-center justify-top">Vorteile auf einen Blick</p> 
       </div>
-      <div class="grid grid-cols-4 mt-12 gap-4 grid-rows-2 rounded-xl grow mx-8 text-green-700">
+      <div class="grid grid-cols-4 mt-12 gap-20 grid-rows-2 rounded-xl grow ml-20 mr-10 text-left text-green-700">
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/1.svg" alt="Benefit 1 Image" class="" />
           </div>
-          <p class="text-center text-3xl mt-4 font-medium">Hybrides Monitoring</p>
-          <p class="text-center text-xl mt-1 font-medium">Messung und Auswertung aller relevanten Einflussfaktoren</p>
+          <p class="text-2xl mt-4 font-bold">Hybrides Monitoring</p>
+          <p class="text-xl mt-1 font-medium">Messung und Auswertung aller relevanten Einflussfaktoren</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/2.svg" alt="Benefit 2 Image" class="" />
           </div>
-          <p class="text-center text-3xl mt-4 font-medium">Automatische Versorgung</p>
-          <p class="text-center text-xl mt-1 font-medium">Kabellose, modulare Plug and Play Automatisierung</p>
+          <p class="text-2xl mt-4 font-bold">Automatische Versorgung</p>
+          <p class="text-xl mt-1 font-medium">Kabellose, modulare Plug and Play Automatisierung</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/3.svg" alt="Benefit 3 Image" class="" />
           </div>
-          <p class="text-center text-3xl mt-4 font-medium">Intelligente Gartenassistenz</p>
-          <p class="text-center text-xl mt-1 font-medium">Interaktiv angeleitet, ohne Vorwissen, erfolgreich anpflanzen und kultivieren</p>
+          <p class="text-2xl mt-4 font-bold">Intelligente Gartenassistenz</p>
+          <p class="text-xl mt-1 font-medium">Interaktiv angeleitet, ohne Vorwissen, erfolgreich kultivieren</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/4.svg" alt="Benefit 4 Image" class="" />
           </div>
-          <p class="text-center text-3xl mt-4 font-medium">Günstige Smarthome-Technik</p>
-          <p class="text-center text-xl mt-1 font-medium">Geringere Anschaffungskosten als konventionelle Systeme</p>
+          <p class="text-2xl mt-4 font-bold">Smarthome Prinzip</p>
+          <p class=" text-xl mt-1 font-medium">Kabellos, flexibel, unkompliziert, erweiterbar, günstig</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/5.svg" alt="Benefit 5 Image" class="" />
           </div>
-          <p class="text-center text-3xl mt-4 font-medium">Zeitersparnis</p>
-          <p class="text-center text-xl mt-1 font-medium">Weniger Zeit und Mühe, dafür mehr Zeit zum genießen</p>
+          <p class="text-2xl mt-4 font-bold">Zeitersparnis</p>
+          <p class="text-xl mt-1 font-medium">Weniger Zeit und Mühe, dafür mehr Zeit zum genießen</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/6.svg" alt="Benefit 6 Image" class="" />
           </div>
-          <p class="text-center text-3xl mt-4 font-medium">Mehr Ertrag</p>
-          <p class="text-center text-xl mt-1 font-medium">Egal was du ernten willst, wir machen einfach mehr daraus</p>
+          <p class="text-2xl mt-4 font-bold">Mehr Ertrag</p>
+          <p class="text-xl mt-1 font-medium">Egal was du ernten willst, wir machen einfach mehr daraus</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/7.svg" alt="Benefit 7 Image" class="" />
           </div>
-          <p class="text-center text-3xl mt-4 font-medium">Versorgung in Abwesenheit</p>
-          <p class="text-center text-xl mt-1 font-medium">Erfolgreich im Garten, trotz flexiblen Lebensstil</p>
+          <p class="text-2xl mt-4 font-bold">Versorgung in Abwesenheit</p>
+          <p class="text-xl mt-1 font-medium">Erfolgreich im Garten, trotz flexiblen Lebensstil</p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/8.svg" alt="Benefit 8 Image" class="" />
           </div>
-          <p class="text-center text-3xl mt-4 font-medium">Keine Sorgen mehr</p>
-          <p class="text-center text-xl mt-1 font-medium">Nix ist sicher aber deine Pflanzen sind nah dran</p>
+          <p class="text-2xl mt-4 font-bold">Keine Sorgen mehr</p>
+          <p class="text-xl mt-1 font-medium">Nix ist sicher aber deine Pflanzen sind nah dran</p>
         </div>
       </div>
     </section>
@@ -572,30 +625,16 @@ onMounted(() => {
   align-items: top;
   justify-content: center; /* Vollständige Anzeigehöhe */
   box-sizing: border-box;
+  margin: 0 0 100vh 0;
 }
 
-.showcase-content1 {
+.showcase-content {
   display: flex;
   width: 100%;
-}
-
-.showcase-content2 {
-  margin-top: -40vh;
-  display: flex;
-  width: 100%;
-  opacity: 0;
-}
-
-.showcase-content3 {
-  margin-top: -40vh;
-  margin-bottom: 60vh;
-  display: flex;
-  width: 100%;
-  opacity: 0;
 }
 
 /* Linker Bereich (1/3) */
-.showcase-info1 {
+.showcase-info {
   flex: 1; /* 1/3 */
   background-color: #68b34b ; /* Hintergrundfarbe nach Wunsch */
   position: relative;
@@ -609,10 +648,10 @@ onMounted(() => {
   justify-content: space-between;
 }
 
-.showcase-info-text1 {
-  text-align: center;
-  padding-left: 12px;
-  padding-right: 12px;
+.showcase-info-text {
+  text-align: left;
+  padding-left: 10%;
+  padding-right: 10%;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -620,17 +659,17 @@ onMounted(() => {
 }
 
 /* Rechter Bereich (2/3) */
-.image-container1 {
+.image-container {
   flex: 2; /* 2/3 */
   display: flex;
+  position: relative;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  justify-content: top;
   flex-grow: q;
   height: 100vh;
 }
 
-.showcase-image1 {
+.showcase-image {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
@@ -643,88 +682,8 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-.showcase-info2 {
-  flex: 1; /* 1/3 */
-  background-color: #68b34b ; /* Hintergrundfarbe nach Wunsch */
-  position: relative;
-  width: 30%;
-  height: 100vh;
-  border-radius: 0px 15px 15px 0px; /* Runde Ecken */
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
 .bg-secondary {
   background-color: #68b34b;
-}
-
-.showcase-info-text2 {
-  text-align: center;
-  padding-left: 12px;
-  padding-right: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  min-height: 100%;
-}
-
-/* Rechter Bereich (2/3) */
-.image-container2 {
-  flex: 2; /* 2/3 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-grow: q;
-  height: 100vh;
-}
-
-.showcase-image2 {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
-}
-
-.showcase-info3 {
-  flex: 1; /* 1/3 */
-  background-color: #68b34b ; /* Hintergrundfarbe nach Wunsch */
-  position: relative;
-  width: 30%;
-  height: 100vh;
-  border-radius: 0px 15px 15px 0px; /* Runde Ecken */
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.showcase-info-text3 {
-  text-align: center;
-  padding-left: 12px;
-  padding-right: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  min-height: 100%;
-}
-
-/* Rechter Bereich (2/3) */
-.image-container3 {
-  flex: 2; /* 2/3 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-grow: q;
-  height: 100vh;
-}
-
-.showcase-image3 {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
 }
 
 .smallShowcase, .largeShowcase {
@@ -737,8 +696,13 @@ onMounted(() => {
 .benefit {
   display: flex;
   flex-direction: column;
-  margin-left: 30%;
-  margin-right: 30%;
+  margin-left: 10%;
+  margin-right: 50%;
+  margin-bottom: 2%;
+}
+
+.bg-lightblue {
+  background-color: #8aaabd;
 }
 
 /* Responsive Verhalten */
