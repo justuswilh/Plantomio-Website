@@ -104,7 +104,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           </UFormField>
         </div>
 
-        <div class="flex flex-row gap-6 mt-6 justify-center">
+        <div class="text-inpust-fields gap-6 mt-6">
           <!-- Name -->
           <UFormField label="Name" name="name" size="xl" required>
             <UInput v-model="form.name" placeholder="Ihr Vorname" />
@@ -150,5 +150,22 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 /* Styling für Fehlernachrichten */
 .text-red-500 {
   color: #f56565;
+}
+
+.text-inpust-fields {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 98%;
+  }
+
+  .text-inpust-fields {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 </style>

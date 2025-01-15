@@ -1,7 +1,7 @@
 <template>
   <UApp>
     <NuxtLayout>
-      <NuxtPage />
+      <NuxtPage content="width=device-width, initial-scale=1.0" />
     </NuxtLayout>
   </UApp>
 </template>

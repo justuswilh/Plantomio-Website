@@ -105,6 +105,10 @@
     margin: 10vh 0;
   }
 
-
+  @media (max-width: 768px) {
+  .section {
+    min-height: 60vh;
+  }
+  }
   </style>
   

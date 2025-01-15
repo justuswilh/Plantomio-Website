@@ -7,17 +7,17 @@ const items = ref([
   },
   {
     title: 'Closed Beta',
-    description: 'Beta-Testphase mit ausgewählten Nutzern',
+    description: 'Beta Testphase mit ausgewählten Nutzern',
     icon: 'i-material-symbols:lock-outline',
   },
   {
     title: 'Open Beta',
-    description: 'Beta-Testphase offen für alle',
+    description: 'Beta Testphase offen für alle',
     icon: 'i-material-symbols:lock-open-right-outline',
   },
   {
     title: 'Release',
-    description: 'Offizielle Produktveröffentlichung',
+    description: 'Offizielle Veröffentlichung',
     icon: 'i-material-symbols:package-2-outline',
   },
 ])

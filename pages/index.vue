@@ -4,8 +4,27 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Contact from '~/components/Contact.vue'
 import ShowcaseCarousel from '~/components/ShowcaseCarousel.vue'
 
-gsap.registerPlugin(ScrollTrigger)
 onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Alle Standard-Animationen, die für alle Breakpoints gelten
+  initGlobalAnimations();
+
+  // Breakpoint-spezifische ScrollTriggers
+  ScrollTrigger.matchMedia({
+    // -------- DESKTOP (min-width: 769px) --------
+    "(min-width: 769px)": function() {
+      initDesktopTriggers();
+    },
+
+    // -------- MOBILE / TABLET (max-width: 768px) --------
+    "(max-width: 768px)": function() {
+      initMobileTriggers();
+    }
+  });
+});
+
+function initGlobalAnimations() {
     // Overlay Animation
     gsap.set('#black-overlay', { autoAlpha: 1 })
     gsap.to('#black-overlay', {
@@ -18,12 +37,62 @@ onMounted(() => {
       { y: '20%', autoAlpha: 0 },
       { y: '0%', autoAlpha: 1, duration: 1.2, delay: 0.2 }
     )
+  }
 
-    // Scroll-triggered Animations
-    initGsapAnimations()
-  })
+  function initMobileTriggers() {
+    // ScrollTrigger für #effekt-word1
+    ScrollTrigger.create({
+      trigger: '#word-section1',
+      start: 'top+=50 center',
+      end: 'bottom+=50 center',
+      pin: true,
+      onEnter: () => {
+              gsap.set('#pinned-heading', { autoAlpha: 0 });
+              gsap.set('#effekt-word1', { autoAlpha: 1 });
+              },
+      onEnterBack: () =>  {
+              gsap.set('#pinned-heading', { autoAlpha: 0 });
+              gsap.set('#effekt-word1', { autoAlpha: 1 });
+              },
+      onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
+    });
 
-  function initGsapAnimations() {
+    // ScrollTrigger für #effekt-word2
+    ScrollTrigger.create({
+      trigger: '#word-section2',
+      start: 'top+=50 center',
+      end: 'bottom+=50 center',
+      pin: true,
+      onEnter: () => {
+        gsap.set('#effekt-word1', { autoAlpha: 0 });
+        gsap.set('#effekt-word2', { autoAlpha: 1 });
+      },
+      onEnterBack: () => {
+        gsap.set('#effekt-word1', { autoAlpha: 0 });
+        gsap.set('#effekt-word2', { autoAlpha: 1 });
+      },
+      onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
+    });
+
+    // ScrollTrigger für #effekt-word3
+    ScrollTrigger.create({
+      trigger: '#word-section3',
+      start: 'top+=50 center',
+      end: 'bottom+=50 center',
+      pin: true,
+      onEnter: () => {
+        gsap.set('#effekt-word2', { autoAlpha: 0 });
+        gsap.set('#effekt-word3', { autoAlpha: 1 });
+      },
+      onEnterBack: () => {
+        gsap.set('#effekt-word2', { autoAlpha: 0 });
+        gsap.set('#effekt-word3', { autoAlpha: 1 });
+      },
+      onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
+    });
+  }
+
+  function initDesktopTriggers() {
 
     // Animation für #pinned-heading
     gsap.timeline({
@@ -240,7 +309,7 @@ onMounted(() => {
     <!-- 3) Erste Überschrift (pinned + skaliert) -->
     <section
       id="pinned-heading-section"
-      class="pinned-heading-section"
+      class="pinned-heading-section mobil-invisible"
     >
       <h1 id="pinned-heading" class="pinned-heading">
         Automatische Versorgung für deine Pflanzen!<br />
@@ -280,10 +349,10 @@ onMounted(() => {
         </div>
         <!-- Rechter Bereich (2/3) -->
         <div class="image-container">
-          <img src="/showcase/1.png" alt="Showcase Image" class="showcase-image absolute" />
-          <img src="/showcase/2.png" alt="Showcase Image" id="step2" class="showcase-image absolute invisible" />
-          <img src="/showcase/3.png" alt="Showcase Image" id="step3" class="showcase-image absolute invisible" />
-          <div class="flex w-full gap-3 flex-col mb-4 mt-auto">
+          <img src="/showcase/1.png" alt="Showcase Image" class="showcase-image" />
+          <img src="/showcase/2.png" alt="Showcase Image" id="step2" class="showcase-image-hidden mobil-invisible" />
+          <img src="/showcase/3.png" alt="Showcase Image" id="step3" class="showcase-image-hidden mobil-invisible" />
+          <div class="flex w-full gap-3 flex-col mb-4 z-50 mobil-invisible mt-auto">
             <div class="flex w-full text-lg font-semibold flex-col">
               <p class="font-normal uppercase py-1 tracking-widest px-10">Monitoring</p>
               <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
@@ -333,40 +402,8 @@ onMounted(() => {
           </div>
         </div>
         <!-- Rechter Bereich (2/3) -->
-        <div class="image-container invisible">
+        <div class="image-container-invisible">
           <img src="/showcase/2.png" alt="Showcase Image" class="showcase-image" />
-          <div class="flex w-full px-6 gap-4 flex-row">
-            <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
-              <p class="pt-1 font-bold">Monitoring</p>
-              <p class="border-2 rounded-md">Feuchtigkeit im Pflanzsubstrat</p>
-              <div class="flex flex-row gap-1">
-                <p class="border-2 w-1/2 rounded-md ">Füllstand</p>
-                <p class="border-2 w-1/2 rounded-md ">Wassertemperatur</p>
-              </div>
-              <div class="flex flex-row gap-1">
-                <p class="border-2 w-1/2 rounded-md ">EC-Wert</p>
-                <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
-              </div>
-              <div class="flex flex-row invisible gap-1">
-                <p class="border-2 w-1/2 rounded-md ">Temperatur</p>
-                <p class="border-2 w-1/2 rounded-md ">Luftfeuchtigkeit</p>
-              </div>
-              <div class="flex flex-row invisible gap-1">
-                <p class="border-2 w-1/2 rounded-md ">VPD</p>
-                <p class="border-2 w-1/2 rounded-md ">Optisch</p>
-              </div>
-            </div>
-            <div class="flex w-2/5 text-center text-lg font-normal gap-1 flex-col-reverse">
-              <p class="pt-1 font-bold">Automatisierung</p>
-              <p class="border-2 rounded-md ">Bewässerung</p>
-              <p class="border-2 rounded-md ">Nährstoffversorgung</p>
-              <div class="flex flex-row gap-1">
-                <p class="border-2 w-1/2 rounded-md ">Wasserbezug</p>
-                <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
-              </div>
-              <p class="border-2 rounded-md invisible">Klimamanagement</p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -384,38 +421,36 @@ onMounted(() => {
           </div>
         </div>
         <!-- Rechter Bereich (2/3) -->
-        <div class="image-container invisible">
-          <img src="/showcase/3.png" alt="Showcase Image" class="showcase-image" />
-          <div class="flex w-full px-6 gap-4 flex-row">
-            <div class="flex w-3/5 text-center text-lg font-normal gap-1 flex-col-reverse">
-              <p class="pt-1 font-bold">Monitoring</p>
-              <p class="border-2 rounded-md">Feuchtigkeit im Pflanzsubstrat</p>
-              <div class="flex flex-row gap-1">
-                <p class="border-2 w-1/2 rounded-md ">Füllstand</p>
-                <p class="border-2 w-1/2 rounded-md ">Wassertemperatur</p>
-              </div>
-              <div class="flex flex-row gap-1">
-                <p class="border-2 w-1/2 rounded-md ">EC-Wert</p>
-                <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
-              </div>
-              <div class="flex flex-row gap-1">
-                <p class="border-2 w-1/2 rounded-md ">Temperatur</p>
-                <p class="border-2 w-1/2 rounded-md ">Luftfeuchtigkeit</p>
-              </div>
-              <div class="flex flex-row gap-1">
-                <p class="border-2 w-1/2 rounded-md ">VPD</p>
-                <p class="border-2 w-1/2 rounded-md ">Optisch</p>
+        <div class="image-container-invisible">
+          <img src="/showcase/3.png" alt="Showcase Image" class="showcase-image mobil-padding-top" />
+          <div class="flex w-full gap-3 flex-col mb-4 z-50 mt-auto">
+            <div class="flex w-full text-lg font-semibold flex-col">
+              <p class="font-normal uppercase py-1 tracking-widest px-10">Monitoring</p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
+                <div class="flex flex-col w-1/3">
+                  <p class="">Feuchtigkeit im Pflanzsubstrat</p>
+                </div>
+                <div class="flex flex-col w-1/3">
+                  <p>Füllstand, Wassertemperatur, EC-Wert, Ph-Wert</p>
+                </div>
+                <div class="flex flex-col w-1/3">
+                  <p>Temperatur, Luftfeuchtigkeit, Optisch, VPD (Dampfdruckdefizit)</p>
+                </div>
               </div>
             </div>
-            <div class="flex w-2/5 text-center text-lg font-normal gap-1 flex-col-reverse">
-              <p class="pt-1 font-bold">Automatisierung</p>
-              <p class="border-2 rounded-md ">Bewässerung</p>
-              <p class="border-2 rounded-md ">Nährstoffversorgung</p>
-              <div class="flex flex-row gap-1">
-                <p class="border-2 w-1/2 rounded-md ">Wasserbezug</p>
-                <p class="border-2 w-1/2 rounded-md ">Ph-Wert</p>
+            <div class="flexd text-lg w-full font-semibold flex-col">
+              <p class="font-normal tracking-widest py-1 uppercase px-10">Automatisierung</p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
+                <div class="flex flex-col w-1/3">
+                  <p class="">Bewässerung</p>
+                </div>
+                <div class="flex flex-col w-1/3">
+                  <p>Nährstoffversorgung, Ph-Management, Wasserbezug</p>
+                </div>
+                <div class="flex flex-col w-1/3">
+                  <p>Klimamanagement</p>
+                </div>
               </div>
-              <p class="border-2 rounded-md ">Klimamanagement</p>
             </div>
           </div>
         </div>
@@ -426,11 +461,11 @@ onMounted(() => {
       <ShowcaseCarousel />
     </section>
 
-    <section class="flex flex-col h-screen">
+    <section class="flex flex-col min-h-screen">
       <div class="flex flex-col bg-secondary text-white">
         <p class="text-4xl font-semibold mt-6 mb-8 text-center justify-top">Vorteile auf einen Blick</p> 
       </div>
-      <div class="grid grid-cols-4 mt-12 gap-20 grid-rows-2 rounded-xl grow ml-20 mr-10 text-left text-green-700">
+      <div class="benefits-grid">
         <div class="flex flex-col">
           <div class="benefit">
             <img src="/benefit/1.svg" alt="Benefit 1 Image" class="" />
@@ -485,7 +520,7 @@ onMounted(() => {
             <img src="/benefit/8.svg" alt="Benefit 8 Image" class="" />
           </div>
           <p class="text-2xl mt-4 font-bold">Keine Sorgen mehr</p>
-          <p class="text-xl mt-1 font-medium">Nix ist sicher aber deine Pflanzen sind nah dran</p>
+          <p class="text-xl mt-1 font-medium">Nichts im Leben ist sicher aber deine Pflanzen sind nah dran</p>
         </div>
       </div>
     </section>
@@ -669,10 +704,30 @@ onMounted(() => {
   height: 100vh;
 }
 
+.image-container-invisible {
+  flex: 2; /* 2/3 */
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: top;
+  flex-grow: q;
+  height: 100vh;
+  opacity: 0;
+}
+
 .showcase-image {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+  position: absolute;
+}
+
+.showcase-image-hidden {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+  position: absolute;
+  opacity: 0;
 }
 
 .device-image {
@@ -684,13 +739,6 @@ onMounted(() => {
 
 .bg-secondary {
   background-color: #68b34b;
-}
-
-.smallShowcase, .largeShowcase {
-    max-height: 75vh;
-    width: auto;
-    object-fit: contain;
-    margin: 0 auto;
 }
 
 .benefit {
@@ -705,15 +753,75 @@ onMounted(() => {
   background-color: #8aaabd;
 }
 
-/* Responsive Verhalten */
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 3rem;          /* mt-12 */
+  gap: 5rem;                 /* gap-20 */
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  border-radius: 0.75rem;    /* rounded-xl */
+  flex-grow: 1;              /* grow */
+  margin-left: 5rem;         /* ml-20 */
+  margin-right: 2.5rem;      /* mr-10 */
+  text-align: left;          /* text-left */
+  color: #047857;            /* text-green-700 (Tailwind Standard: #047857) */
+}
+
 @media (max-width: 768px) {
+  .word-section {
+    align-items: top;      /* statt center */
+    justify-content: center;
+    height: 100vh;         /* zusätzlich */
+    width: 100%;           /* zusätzlich */
+    margin: 50vh 0 80vh 0; /* zusätzlich */
+  }
+
+  .showcase-section {
+    width: 100%;           /* zusätzlich */
+    margin: 0;             /* zusätzlich */
+  }
+
   .showcase-content {
-    flex-direction: column;
+    flex-direction: column;/* zusätzlich */
+  }
+
+  .mobil-invisible {
+    display: none;
   }
 
   .showcase-info {
-    transform: translateX(0); /* Keine Seitentransformation auf kleinen Bildschirmen */
+    width: 100%;           /* statt 30% */
+    transform: translateX(0px); /* statt -800px */
+    height: fit-content;
   }
+
+  .showcase-info-text {
+    padding: 5vh 6vw;     /* zusätzlich */
+    gap: 4vh;             /* zusätzlich */
+  }
+
+  .showcase-image {
+  position: relative;
+  }
+
+  .mobil-padding-top {
+    padding-top: 3vh;
+  }
+
+  .image-container-invisible {
+    opacity: 1;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    gap: 2rem;             /* zusätzlich */
+    margin-left: 2.5rem;   /* zusätzlich */
+    margin-right: 2.5rem;  /* zusätzlich */
+    margin: 1vh 2.5rem 3vh 2.5rem; /* zusätzlich */
+  }
+
+
 }
  </style>
   

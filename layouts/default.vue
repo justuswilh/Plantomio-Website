@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col bg-white min-h-screen">
     <div class="flex flex-row items-start grow">
-      <main class="flex grow max-w-full text-black with-100 items-center">
+      <main class="flex grow w-screen text-black">
         <slot />
       </main>
     </div>
