@@ -1,28 +1,97 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import Contact from '~/components/Contact.vue'
 import ShowcaseCarousel from '~/components/ShowcaseCarousel.vue'
 
 onMounted(() => {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger)
+  gsap.registerPlugin(ScrollToPlugin)
 
-  // Alle Standard-Animationen, die für alle Breakpoints gelten
-  initGlobalAnimations();
+  // Globale Animationen
+  initGlobalAnimations()
 
-  // Breakpoint-spezifische ScrollTriggers
+  // ScrollTrigger-Breakpoints
   ScrollTrigger.matchMedia({
-    // -------- DESKTOP (min-width: 769px) --------
-    "(min-width: 769px)": function() {
-      initDesktopTriggers();
+    '(min-width: 769px)': () => {
+      initDesktopTriggers()
     },
+    '(max-width: 768px)': () => {
+      initMobileTriggers()
+    },
+  })
 
-    // -------- MOBILE / TABLET (max-width: 768px) --------
-    "(max-width: 768px)": function() {
-      initMobileTriggers();
-    }
-  });
-});
+  // Idle-Auto-Scroll aktivieren
+  initIdleAutoScroll()
+})
+
+function initIdleAutoScroll() {
+  const INACTIVITY_LIMIT = 1000 // z.B. 2s
+  let inactivityTimer: number
+  let autoScrolling = false
+  let autoScrollTween: gsap.core.Tween | null = null
+
+  // Timer neu starten
+  function resetTimer() {
+    clearTimeout(inactivityTimer)
+    inactivityTimer = window.setTimeout(() => {
+      if (!autoScrolling) {
+        autoScrolling = true
+        autoScrollTween = gsap.to(window, {
+          scrollTo: '#showcase-section',
+          duration: 4,
+          ease: "sine.inOut",
+          onComplete: () => {
+            autoScrolling = false
+            autoScrollTween = null
+          },
+        })
+      }
+    }, INACTIVITY_LIMIT)
+  }
+
+  // 1) Wheel-Event (Desktop / Trackpad)
+  window.addEventListener(
+    'wheel',
+    (e) => {
+      // e.deltaY ≠ 0 => es wird wirklich gescrollt
+      if (Math.abs(e.deltaY) > 0) {
+        resetTimer()
+
+        // (Optional) Falls Du einen laufenden Auto-Scroll abbrechen willst:
+        if (autoScrolling && autoScrollTween?.isActive()) {
+          autoScrollTween.kill()
+          autoScrollTween = null
+          autoScrolling = false
+          // Weicher Abbruch
+          gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
+        }
+      }
+    },
+    { passive: true }
+  )
+
+  // 2) Touchmove-Event (Mobile Touch-Scroll)
+  window.addEventListener(
+    'touchmove',
+    () => {
+      resetTimer()
+
+      if (autoScrolling && autoScrollTween?.isActive()) {
+        autoScrollTween.kill()
+        autoScrollTween = null
+        autoScrolling = false
+        gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
+      }
+    },
+    { passive: true }
+  )
+
+  // Timer beim Start
+  resetTimer()
+}
 
 function initGlobalAnimations() {
     // Overlay Animation
@@ -169,6 +238,7 @@ function initGlobalAnimations() {
       trigger: '#showcase-section',
       start: 'top+=200 center',
       end: 'bottom+=50 center',
+      scrub: true,
       onEnter: () => {
         gsap.to('#showcase-info1', {
           x: 0, 
@@ -197,7 +267,7 @@ function initGlobalAnimations() {
     .fromTo(
       '#effekt-word3',
       { y: 0 },
-      { y: -200, duration: 1 }
+      { y: -200, duration: 5 }
     )
 
     // Showcase-Content 1 pinnen 
@@ -207,7 +277,7 @@ function initGlobalAnimations() {
       end: 'bottom top', 
       pin: '#showcase-content1',
       pinSpacing: false,
-      anticipatePin: 1,
+      scrub: true,
   });
 
     // Showcase-Content 2 pinnen und einblenden
