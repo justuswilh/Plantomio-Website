@@ -1,6 +1,6 @@
 <!-- CarouselWithText.vue -->
 <template>
-    <div class="section">
+    <div class="section" id="showcaseCarousel">
       <!-- Carousel-Komponente mit Ref -->
       <UCarousel
         ref="carouselRef"
@@ -93,7 +93,7 @@
 
   .picture {
    padding-left: 4vw;
-    padding-right: 4vw;
+   padding-right: 4vw;
   }
 
   .section {

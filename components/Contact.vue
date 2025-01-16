@@ -10,6 +10,7 @@ const schema = v.object({
   name: v.pipe(v.string(), v.minLength(1, 'Name ist erforderlich')),
   nachname: v.pipe(v.string(), v.minLength(1, 'Nachname ist erforderlich')),
   email: v.pipe(v.string(), v.email('Ungültige E-Mail-Adresse')),
+  text: v.string(),
 })
 
 // Inferenz des Schematyps
@@ -17,11 +18,12 @@ type Schema = v.InferOutput<typeof schema>
 
 // Reaktiver Zustand des Formulars
 const form = reactive<Schema>({
-  newsletter: true,
+  newsletter: false,
   betaProgram: false,
   name: '',
   nachname: '',
   email: '',
+  text: '',
 })
 
 // Reaktiver Zustand für Validierungsfehler
@@ -31,6 +33,12 @@ const errors = reactive<Record<keyof Schema, string | null>>({
   name: null,
   nachname: null,
   email: null,
+  text: null,
+})
+
+// Reaktiver Zustand für die Bestätigungsnachricht
+const confirmationMessage = reactive<{ text: string | null }>({
+  text: null,
 })
 
 // Formular-Submit-Funktion mit Validierung
@@ -74,14 +82,14 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     if (!sendFormResponse.ok) {
       // Server hat geantwortet, aber mit Fehlerstatus
       console.error('Fehler beim Versenden des Formulars:', sendFormResult)
-      alert(sendFormResult.statusMessage || 'Fehler beim Senden der E-Mail.')
+      errors.text = sendFormResult.statusMessage || 'Fehler beim Senden der E-Mail.'
       return
     }
 
     console.log('Formular abgesendet (sendFormResult):', sendFormResult)
 
-    // Bestätigung anzeigen
-    alert('Vielen Dank für Ihre Anmeldung zur Closed Beta!')
+    // Bestätigungsnachricht setzen
+    confirmationMessage.text = sendFormResult.message
 
     // Formular zurücksetzen
     form.newsletter = true
@@ -91,7 +99,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     form.email = ''
   } catch (error) {
     console.error('Ein unerwarteter Fehler ist aufgetreten:', error)
-    alert('Ein Fehler ist aufgetreten. Bitte versuche es später erneut.')
+    errors.email = 'Ein Fehler ist aufgetreten. Bitte versuche es später erneut.'
   }
 }
 </script>
@@ -124,13 +132,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <UCheckbox v-model="form.betaProgram" label="Interesse am Beta-Programm" size="xl" />
           </UFormField>
         </div>
-
+        <p v-if="errors.text" class="text-red-500 text-sm text-center mt-1">{{ errors.text }}</p>
         <div class="text-inpust-fields gap-6 mt-6">
           <!-- Name -->
           <UFormField label="Name" name="name" size="xl" required>
             <UInput v-model="form.name" placeholder="Ihr Vorname" />
             <!-- Fehleranzeige für Name -->
-            <p v-if="errors.name" class="text-red-500 text-sm mt-1">{{ errors.name }}</p>
+            <p v-if="errors.name" class="text-red-500 static text-sm mt-1">{{ errors.name }}</p>
           </UFormField>
 
           <!-- Nachname -->
@@ -154,6 +162,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             Absenden
           </UButton>
         </div>
+        <!-- Bestätigungsnachricht -->
+        <p v-if="confirmationMessage.text" class="text-primary text-xl mt-4 text-center">
+            {{ confirmationMessage.text }}
+        </p>
         <p class="text-center mt-8">
           Mit dem Absenden des Formulars erkläre ich mich mit den
           Datenschutzbestimmungen einverstanden.
@@ -172,6 +184,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 /* Styling für Fehlernachrichten */
 .text-red-500 {
   color: #f56565;
+}
+
+/* Styling für Bestätigungsnachricht */
+.text-green-500 {
+  color: #48bb78;
 }
 
 .text-inpust-fields {

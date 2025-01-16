@@ -19,6 +19,7 @@
     "@nuxt/schema": "^3.15.2",
     "@nuxt/ui": "3.0.0-alpha.10",
     "@nuxthq/studio": "^2.2.1",
+    "@prisma/client": "^6.2.1",
     "@vueuse/nuxt": "^11.3.0",
     "consola": "^3.3.3",
     "defu": "^6.1.4",
@@ -29,10 +30,11 @@
     "is-glob": "^4.0.3",
     "nodemailer": "^6.9.16",
     "nuxt": "^3.15.2",
+    "prisma": "^6.2.1",
     "ts-case-convert": "^2.1.0",
     "typescript": "^5.7.3",
     "ui@next": "link:nuxt/ui@next",
-    "valibot": "1.0.0-beta.11",
+    "valibot": "1.0.0-beta.12",
     "vue-tsc": "^2.2.0"
   },
   "packageManager": "pnpm@6.14.5"

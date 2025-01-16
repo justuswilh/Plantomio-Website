@@ -25,24 +25,55 @@ onMounted(() => {
 
   // Idle-Auto-Scroll aktivieren
   initIdleAutoScroll()
+
+  initIdleAutoScrollToBenefits()
 })
 
-function initIdleAutoScroll() {
-  const INACTIVITY_LIMIT = 1000 // z.B. 2s
+/**
+ *  ----------------------------
+ *  1) ERSTER AUTOSCROLL (wie gehabt)
+ *  ----------------------------
+ */
+ function initIdleAutoScroll() {
+  const INACTIVITY_LIMIT = 2000 // z.B. 2s
   let inactivityTimer: number
   let autoScrolling = false
   let autoScrollTween: gsap.core.Tween | null = null
+  let autoScrollAllowed = true
 
-  // Timer neu starten
+  // Keyframe Trigger, der den ersten Autoscroll deaktiviert
+  ScrollTrigger.create({
+    trigger: '#showcase-section',
+    start: 'top top',
+    onEnter: () => {
+      disableAutoScroll()
+    },
+  })
+
+  function disableAutoScroll() {
+    autoScrollAllowed = false
+
+    if (autoScrolling && autoScrollTween?.isActive()) {
+      autoScrollTween.kill()
+      autoScrollTween = null
+      autoScrolling = false
+    }
+
+    window.removeEventListener('wheel', onWheel, { passive: true } as AddEventListenerOptions)
+    window.removeEventListener('touchmove', onTouchMove, { passive: true } as AddEventListenerOptions)
+  }
+
   function resetTimer() {
+    if (!autoScrollAllowed) return
+
     clearTimeout(inactivityTimer)
     inactivityTimer = window.setTimeout(() => {
-      if (!autoScrolling) {
+      if (!autoScrolling && autoScrollAllowed) {
         autoScrolling = true
         autoScrollTween = gsap.to(window, {
           scrollTo: '#showcase-section',
-          duration: 4,
-          ease: "sine.inOut",
+          duration: 5,
+          ease: 'sine.inOut',
           onComplete: () => {
             autoScrolling = false
             autoScrollTween = null
@@ -52,45 +83,130 @@ function initIdleAutoScroll() {
     }, INACTIVITY_LIMIT)
   }
 
-  // 1) Wheel-Event (Desktop / Trackpad)
-  window.addEventListener(
-    'wheel',
-    (e) => {
-      // e.deltaY ≠ 0 => es wird wirklich gescrollt
-      if (Math.abs(e.deltaY) > 0) {
-        resetTimer()
-
-        // (Optional) Falls Du einen laufenden Auto-Scroll abbrechen willst:
-        if (autoScrolling && autoScrollTween?.isActive()) {
-          autoScrollTween.kill()
-          autoScrollTween = null
-          autoScrolling = false
-          // Weicher Abbruch
-          gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
-        }
-      }
-    },
-    { passive: true }
-  )
-
-  // 2) Touchmove-Event (Mobile Touch-Scroll)
-  window.addEventListener(
-    'touchmove',
-    () => {
+  function onWheel(e: WheelEvent) {
+    if (Math.abs(e.deltaY) > 0) {
       resetTimer()
-
       if (autoScrolling && autoScrollTween?.isActive()) {
         autoScrollTween.kill()
         autoScrollTween = null
         autoScrolling = false
         gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
       }
-    },
-    { passive: true }
-  )
+    }
+  }
 
-  // Timer beim Start
+  function onTouchMove() {
+    resetTimer()
+    if (autoScrolling && autoScrollTween?.isActive()) {
+      autoScrollTween.kill()
+      autoScrollTween = null
+      autoScrolling = false
+      gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
+    }
+  }
+
+  window.addEventListener('wheel', onWheel, { passive: true })
+  window.addEventListener('touchmove', onTouchMove, { passive: true })
+
+  // Timer beim Start aktivieren
   resetTimer()
+}
+
+/**
+ *  2) ZWEITER AUTOSCROLL -> Scrollt langsam bis #showcaseCarousel
+ *     Aktivierung erst, wenn bestimmter Keyframe erreicht.
+ *     Deaktivierung, wenn der Keyframe wieder verlassen wird.
+ */
+ function initIdleAutoScrollToBenefits() {
+  const INACTIVITY_LIMIT_2 = 10000;
+  let inactivityTimer2: number;
+  let autoScrolling2 = false;
+  let autoScrollTween2: gsap.core.Tween | null = null;
+  let autoScrollAllowed2 = false; // Zu Beginn nicht erlaubt
+
+  // ===== ScrollTrigger, der den 2. Autoscroll "freigibt" und auch wieder deaktiviert =====
+  ScrollTrigger.create({
+    trigger: '#showcase-section',
+    start: 'top+=-10 top',
+    // Sobald wir #showcase-section erreichen (von oben nach unten):
+    onEnter: () => {
+      autoScrollAllowed2 = true;
+      resetTimer2();
+    },
+  });
+
+  ScrollTrigger.create({
+    trigger: '#showcaseCarousel',
+    start: 'top top',
+    onEnter: () => {
+      disableAutoScroll2()
+    },
+  })
+
+  // Deaktivierung des zweiten Autoscrolls
+  function disableAutoScroll2() {
+    autoScrollAllowed2 = false;
+
+    // Falls gerade ein Tween läuft, abbrechen
+    if (autoScrolling2 && autoScrollTween2?.isActive()) {
+      autoScrollTween2.kill();
+      autoScrollTween2 = null;
+      autoScrolling2 = false;
+    }
+
+    // Event-Listener entfernen
+    window.removeEventListener('wheel', onWheel2, { passive: true } as AddEventListenerOptions);
+    window.removeEventListener('touchmove', onTouchMove2, { passive: true } as AddEventListenerOptions);
+  }
+
+  // Timer zurücksetzen
+  function resetTimer2() {
+    if (!autoScrollAllowed2) return;
+
+    clearTimeout(inactivityTimer2);
+    inactivityTimer2 = window.setTimeout(() => {
+      if (!autoScrolling2 && autoScrollAllowed2) {
+        autoScrolling2 = true;
+        autoScrollTween2 = gsap.to(window, {
+          scrollTo: '#showcaseCarousel',
+          duration: 40,
+          ease: 'power0.in',
+          onComplete: () => {
+            autoScrolling2 = false;
+            autoScrollTween2 = null;
+          },
+        });
+      }
+    }, INACTIVITY_LIMIT_2);
+  }
+
+  // Läuft, sobald ein Wheel-Event kommt
+  function onWheel2(e: WheelEvent) {
+    if (Math.abs(e.deltaY) > 0) {
+      resetTimer2();
+      interruptAutoScroll2();
+    }
+  }
+
+  // Läuft, sobald ein TouchMove-Event kommt
+  function onTouchMove2() {
+    resetTimer2();
+    interruptAutoScroll2();
+  }
+
+  // Löst einen laufenden Autoscroll-Tween ab
+  function interruptAutoScroll2() {
+    if (autoScrolling2 && autoScrollTween2?.isActive()) {
+      autoScrollTween2.kill();
+      autoScrollTween2 = null;
+      autoScrolling2 = false;
+      gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 });
+    }
+  }
+
+  // Event Listener
+  window.addEventListener('wheel', onWheel2, { passive: true });
+  window.addEventListener('touchmove', onTouchMove2, { passive: true });
 }
 
 function initGlobalAnimations() {
@@ -541,7 +657,7 @@ function initGlobalAnimations() {
       <ShowcaseCarousel />
     </section>
 
-    <section class="flex flex-col text-primary min-h-screen">
+    <section id="benefits" class="flex flex-col text-primary min-h-screen">
       <div class="flex flex-col bg-secondary text-white">
         <p class="text-4xl font-semibold mt-6 mb-8 text-center justify-top">Vorteile auf einen Blick</p> 
       </div>
@@ -607,7 +723,7 @@ function initGlobalAnimations() {
 
     <Contact />
 
-    <footer class="flex flex-col text-lg text-lime-100 bg-footer mt-12 pt-6">
+    <footer class="flex flex-col text-lg text-gray-300 bg-footer mt-12 pt-6">
       <div class="flex justify-center gap-20 mb-4">
         <div class="flex grow" />
         <div class="flex flex-col grow items-center">
