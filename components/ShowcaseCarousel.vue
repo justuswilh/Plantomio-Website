@@ -8,7 +8,7 @@
         arrows
         :autoplay="{ delay: 4000 }"
         :items="items"
-        :ui="{ item: 'basis-1/3' }"
+        :ui="{ item: 'basis-full md:basis-1/3' }"
         class="settings"
       >
         <template #default="{ item }">
@@ -108,6 +108,8 @@
   @media (max-width: 768px) {
   .section {
     min-height: 60vh;
+    width: 80%;
+    margin: 20vh auto;
   }
   }
   </style>

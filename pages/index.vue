@@ -43,8 +43,8 @@ function initGlobalAnimations() {
     // ScrollTrigger für #effekt-word1
     ScrollTrigger.create({
       trigger: '#word-section1',
-      start: 'top+=50 center',
-      end: 'bottom+=50 center',
+      start: 'top+=-100 center',
+      end: 'bottom+=-100 center',
       pin: true,
       onEnter: () => {
               gsap.set('#pinned-heading', { autoAlpha: 0 });
@@ -60,8 +60,8 @@ function initGlobalAnimations() {
     // ScrollTrigger für #effekt-word2
     ScrollTrigger.create({
       trigger: '#word-section2',
-      start: 'top+=50 center',
-      end: 'bottom+=50 center',
+      start: 'top+=-100 center',
+      end: 'bottom+=-100 center',
       pin: true,
       onEnter: () => {
         gsap.set('#effekt-word1', { autoAlpha: 0 });
@@ -77,8 +77,8 @@ function initGlobalAnimations() {
     // ScrollTrigger für #effekt-word3
     ScrollTrigger.create({
       trigger: '#word-section3',
-      start: 'top+=50 center',
-      end: 'bottom+=50 center',
+      start: 'top+=-100 center',
+      end: 'bottom+=-100 center',
       pin: true,
       onEnter: () => {
         gsap.set('#effekt-word2', { autoAlpha: 0 });
@@ -296,14 +296,16 @@ function initGlobalAnimations() {
     <!-- 2) Image-Abschnitt (normal im Flow) -->
     <section
       id="image-section"
-      class="flex items-center justify-center h-screen mb-8 w-full"
+      class="hero-section"
     >
-      <img
-        id="hero-image"
-        src="/Logo.svg"
-        alt="Hero"
-        class="w-content max-w-md sm:max-w-lg lg:max-w-xl mx-auto items-center object-cover sm:object-contain"
-      />
+      <div class="hero-image-container">
+        <img
+          id="hero-image"
+          src="/Logo.svg"
+          alt="Hero"
+          class="hero-image"
+        />
+      </div>
     </section>
 
     <!-- 3) Erste Überschrift (pinned + skaliert) -->
@@ -337,7 +339,7 @@ function initGlobalAnimations() {
     <section id="showcase-section" class="showcase-section">
       <div id="showcase-content1" class="showcase-content">
         <!-- Linker Bereich (1/3) -->
-        <div id="showcase-info1" class="showcase-info">
+        <div id="showcase-info1" class="showcase-info bg-secondary">
           <div id="showcase-info-text1" class="showcase-info-text">
             <p class="text-4xl pb-6 text-white font-semibold">Zielgenaue<br />Bewässerung</p>
             <img src="/plantmonitor+plug.png" alt="Showcase Image" class="device-image" />
@@ -388,7 +390,7 @@ function initGlobalAnimations() {
       <!-- Content2 -->
       <div id="showcase-content2" class="showcase-content">
         <!-- Linker Bereich (1/3) -->
-        <div id="showcase-info2" class="showcase-info">
+        <div id="showcase-info2" class="showcase-info bg-secondary">
           <div id="showcase-info-text2" class="showcase-info-text">
             <p class="text-4xl pb-6 text-white font-semibold">Nährstoffversorgung<br />ohne Kompromisse</p>
             <div class="flex flex-col">
@@ -401,7 +403,7 @@ function initGlobalAnimations() {
             </div>
           </div>
         </div>
-        <!-- Rechter Bereich (2/3) -->
+        <!-- Mobilversion Image -->
         <div class="image-container-invisible">
           <img src="/showcase/2.png" alt="Showcase Image" class="showcase-image" />
         </div>
@@ -410,7 +412,7 @@ function initGlobalAnimations() {
       <!-- Content3 -->
       <div id="showcase-content3" class="showcase-content">
         <!-- Linker Bereich (1/3) -->
-        <div id="showcase-info3" class="showcase-info">
+        <div id="showcase-info3" class="showcase-info bg-secondary">
           <div id="showcase-info-text3" class="showcase-info-text">
             <p class="text-4xl pb-6 text-white font-semibold">Volle Kontrolle?<br />Kein Problem!</p>
             <img src="/climatemonitor+plug.png" alt="Showcase Image" class="device-image max-w-sm" />
@@ -420,32 +422,40 @@ function initGlobalAnimations() {
             </div>
           </div>
         </div>
-        <!-- Rechter Bereich (2/3) -->
+        <!-- Mobilversion Image und Beschreibung -->
         <div class="image-container-invisible">
-          <img src="/showcase/3.png" alt="Showcase Image" class="showcase-image mobil-padding-top" />
+          <img src="/showcase/3.png" alt="Showcase Image" class="showcase-image mobil-padding" />
           <div class="flex w-full gap-3 flex-col mb-4 z-50 mt-auto">
             <div class="flex w-full text-lg font-semibold flex-col">
-              <p class="font-normal uppercase py-1 tracking-widest px-10">Monitoring</p>
-              <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
+              <p class="font-normal uppercase py-1 tracking-widest text-2xl px-10">Monitoring</p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 text-xl bg-lightblue text-white">
                 <div class="flex flex-col w-1/3">
-                  <p class="">Feuchtigkeit im Pflanzsubstrat</p>
+                  <p>Substratfeuchtigkeit</p>
+                  <p>Füllstand</p>
+                  <p>Wassertemperatur</p>
                 </div>
                 <div class="flex flex-col w-1/3">
-                  <p>Füllstand, Wassertemperatur, EC-Wert, Ph-Wert</p>
+                  <p>Temperatur</p>
+                  <p>Luftfeuchtigkeit</p>
+                  <p>VPD</p>
                 </div>
                 <div class="flex flex-col w-1/3">
-                  <p>Temperatur, Luftfeuchtigkeit, Optisch, VPD (Dampfdruckdefizit)</p>
+                  <p>EC-Wert</p>
+                  <p>PH-Wert</p>
+                  <p>Optisch</p>
                 </div>
               </div>
             </div>
             <div class="flexd text-lg w-full font-semibold flex-col">
-              <p class="font-normal tracking-widest py-1 uppercase px-10">Automatisierung</p>
-              <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
+              <p class="font-normal tracking-widest py-1 uppercase text-2xl px-10">Automatisierung</p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 text-xl bg-lightblue text-white">
                 <div class="flex flex-col w-1/3">
-                  <p class="">Bewässerung</p>
+                  <p>Bewässerung</p>
+                  <p>Nährstoffversorgung</p>
                 </div>
                 <div class="flex flex-col w-1/3">
-                  <p>Nährstoffversorgung, Ph-Management, Wasserbezug</p>
+                  <p>Ph-Management</p>
+                  <p>Wasserbezug</p>
                 </div>
                 <div class="flex flex-col w-1/3">
                   <p>Klimamanagement</p>
@@ -461,7 +471,7 @@ function initGlobalAnimations() {
       <ShowcaseCarousel />
     </section>
 
-    <section class="flex flex-col min-h-screen">
+    <section class="flex flex-col text-primary min-h-screen">
       <div class="flex flex-col bg-secondary text-white">
         <p class="text-4xl font-semibold mt-6 mb-8 text-center justify-top">Vorteile auf einen Blick</p> 
       </div>
@@ -527,19 +537,19 @@ function initGlobalAnimations() {
 
     <Contact />
 
-    <footer class="flex flex-col text-lg text-stone-300 bg-green-900 mt-12 pt-6">
+    <footer class="flex flex-col text-lg text-lime-100 bg-footer mt-12 pt-6">
       <div class="flex justify-center gap-20 mb-4">
         <div class="flex grow" />
         <div class="flex flex-col grow items-center">
           <div class="flex flex-col items-start w-60">
-            <span class="mb-2 uppercase text-sm text-gray-400">Rechtliches</span>
+            <span class="mb-2 uppercase text-sm">Rechtliches</span>
             <NuxtLink href="https://plantomio.com/impressum" class="mb-2 hover:underline">Impressum</NuxtLink>
             <NuxtLink href="https://plantomio.com/datenschutz" class="hover:underline">Datenschutz</NuxtLink>
           </div>
         </div>
         <div class="flex flex-col grow items-center">
           <div class="flex flex-col items-start w-60">
-            <span class="mb-2 uppercase text-sm text-gray-400">Kontakt</span>
+            <span class="mb-2 uppercase text-sm">Kontakt</span>
             <a href="mailto:kontakt@plantomio.com" class="mb-2 hover:underline">team@plantomio.de</a>
             <a class="">+49 157 87351403</a>
           </div>
@@ -573,7 +583,30 @@ function initGlobalAnimations() {
     justify-content: center;
     align-items: center;
   }
+
+  .hero-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+  }
+
+  .hero-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 30%;
+  }
   
+  .hero-image {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  height: auto;
+  }
+
   /* Überschrift (pinned) */
   .pinned-heading-section {
     position: relative; /* Notwendig für Pinning */
@@ -671,7 +704,6 @@ function initGlobalAnimations() {
 /* Linker Bereich (1/3) */
 .showcase-info {
   flex: 1; /* 1/3 */
-  background-color: #68b34b ; /* Hintergrundfarbe nach Wunsch */
   position: relative;
   width: 30%;
   height: 100vh;
@@ -737,10 +769,6 @@ function initGlobalAnimations() {
   margin: 0 auto;
 }
 
-.bg-secondary {
-  background-color: #68b34b;
-}
-
 .benefit {
   display: flex;
   flex-direction: column;
@@ -764,10 +792,24 @@ function initGlobalAnimations() {
   margin-left: 5rem;         /* ml-20 */
   margin-right: 2.5rem;      /* mr-10 */
   text-align: left;          /* text-left */
-  color: #047857;            /* text-green-700 (Tailwind Standard: #047857) */
 }
 
 @media (max-width: 768px) {
+  .scroll-container {
+    margin-top: 20vh;
+  }
+
+  .hero-image-container {
+    width: 70%;
+  }
+
+  .device-image {
+    max-width: 70%;
+    max-height: 100%;
+    object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+    margin: 0 auto;
+  }
+
   .word-section {
     align-items: top;      /* statt center */
     justify-content: center;
@@ -793,10 +835,11 @@ function initGlobalAnimations() {
     width: 100%;           /* statt 30% */
     transform: translateX(0px); /* statt -800px */
     height: fit-content;
+    border-radius: 15px; /* Runde Ecken */
   }
 
   .showcase-info-text {
-    padding: 5vh 6vw;     /* zusätzlich */
+    padding: 5vh 5vh 10vh 5vh;     /* zusätzlich */
     gap: 4vh;             /* zusätzlich */
   }
 
@@ -804,8 +847,12 @@ function initGlobalAnimations() {
   position: relative;
   }
 
-  .mobil-padding-top {
-    padding-top: 3vh;
+  .mobil-padding {
+    padding: 10vh 0 5vh 0;
+  }
+
+  .mobil-padding-bottom {
+    padding-top: 10vh;
   }
 
   .image-container-invisible {
