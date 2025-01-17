@@ -8,13 +8,13 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/content',
     '@nuxtjs/color-mode',
-    '@nuxthq/studio'
+    '@nuxthq/studio',
   ],
 
   plugins: ['~/plugins/vue3-cookies.js'],
 
   routeRules: {
-    '/': { prerender: true }
+    '/': { prerender: true },
   },
 
   content: {
@@ -38,5 +38,5 @@ export default defineNuxtConfig({
     },
   },
 
-  compatibilityDate: '2024-12-22'
+  compatibilityDate: '2024-12-22',
 })

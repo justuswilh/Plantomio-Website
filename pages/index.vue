@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { onMounted, onUnmounted } from 'vue'
 import Contact from '~/components/Contact.vue'
 import ShowcaseCarousel from '~/components/ShowcaseCarousel.vue'
 import { useCookieBannerState } from '~/composables/useCookieBannerState'
@@ -48,7 +48,7 @@ onMounted(() => {
 onUnmounted(() => {
   // Bereinigen aller ScrollTrigger-Instanzen
   scrollTriggers.forEach(trigger => trigger.kill())
-  
+
   // Bereinigen der matchMedia-Kontexte
   if (mm && typeof mm.revert === 'function') {
     mm.revert()
@@ -94,7 +94,8 @@ function initIdleAutoScroll() {
   }
 
   function resetTimer() {
-    if (!autoScrollAllowed) return
+    if (!autoScrollAllowed)
+      return
 
     clearTimeout(inactivityTimer)
     inactivityTimer = window.setTimeout(() => {
@@ -204,7 +205,8 @@ function initIdleAutoScrollToBenefits() {
 
   // Timer zurücksetzen
   function resetTimer2() {
-    if (!autoScrollAllowed2) return
+    if (!autoScrollAllowed2)
+      return
 
     clearTimeout(inactivityTimer2)
     inactivityTimer2 = window.setTimeout(() => {
@@ -260,7 +262,7 @@ function initGlobalAnimations() {
   gsap.fromTo(
     '#hero-image',
     { y: '20%', autoAlpha: 0 },
-    { y: '0%', autoAlpha: 1, duration: 1.2, delay: 0.2 }
+    { y: '0%', autoAlpha: 1, duration: 1.2, delay: 0.2 },
   )
 }
 
@@ -337,7 +339,7 @@ function initDesktopTriggers() {
   timeline1.fromTo(
     '#pinned-heading',
     { scale: 1 },
-    { scale: 1.2, duration: 0.2 }
+    { scale: 1.2, duration: 0.2 },
   )
   scrollTriggers.push(timeline1.scrollTrigger)
 
@@ -430,7 +432,7 @@ function initDesktopTriggers() {
   timeline2.fromTo(
     '#effekt-word3',
     { y: 0 },
-    { y: -200, duration: 5 }
+    { y: -200, duration: 5 },
   )
   scrollTriggers.push(timeline2.scrollTrigger)
 
@@ -540,9 +542,8 @@ function cleanupEventListeners() {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   </head>
   <div class="scroll-container">
-    
     <!-- 1) Schwarzes Overlay (fixed) -->
-    <div id="black-overlay" class="black-overlay"></div>
+    <div id="black-overlay" class="black-overlay" />
 
     <!-- 2) Image-Abschnitt (normal im Flow) -->
     <section
@@ -555,7 +556,7 @@ function cleanupEventListeners() {
           src="/Logo.svg"
           alt="Hero"
           class="hero-image"
-        />
+        >
       </div>
     </section>
 
@@ -565,7 +566,7 @@ function cleanupEventListeners() {
       class="pinned-heading-section mobil-invisible"
     >
       <h1 id="pinned-heading" class="pinned-heading">
-        Automatische Versorgung für deine Pflanzen!<br />
+        Automatische Versorgung für deine Pflanzen!<br>
         Aber wie?asdfadf a
       </h1>
     </section>
@@ -576,13 +577,19 @@ function cleanupEventListeners() {
       class="word-section text-black z-50"
     >
       <div id="word-section1" class="word-section1">
-        <div id="effekt-word1" class="effekt-word1">Smarthome</div>
+        <div id="effekt-word1" class="effekt-word1">
+          Smarthome
+        </div>
       </div>
       <div id="word-section2" class="word-section2">
-        <div id="effekt-word2" class="effekt-word2">Trifft</div>
+        <div id="effekt-word2" class="effekt-word2">
+          Trifft
+        </div>
       </div>
       <div id="word-section3" class="word-section3">
-        <div id="effekt-word3" class="effekt-word3">Botanik</div>
+        <div id="effekt-word3" class="effekt-word3">
+          Botanik
+        </div>
       </div>
     </section>
 
@@ -592,25 +599,35 @@ function cleanupEventListeners() {
         <!-- Linker Bereich (1/3) -->
         <div id="showcase-info1" class="showcase-info bg-secondary">
           <div id="showcase-info-text1" class="showcase-info-text">
-            <p class="text-4xl pb-6 text-white font-semibold">Zielgenaue<br />Bewässerung</p>
-            <img src="/plantmonitor+plug.png" alt="Showcase Image" class="device-image" />
+            <p class="text-4xl pb-6 text-white font-semibold">
+              Zielgenaue<br>Bewässerung
+            </p>
+            <img src="/plantmonitor+plug.png" alt="Showcase Image" class="device-image">
             <div class="flex flex-col">
-              <p class="text-2xl text-white pb-4 font-semibold">Reduziert Sorgen und Wasserbedarf</p>
-              <p class="text-2xl text-white font-normal whitespace-normal">Dank Monitoring und intelligenter Steuerung schließt du nicht nur Unterversorgung aus, sondern profitierst auch vom Wasser-Sparpotential einer bedarfsgerechten Tröpfchenbewässerung.</p>
+              <p class="text-2xl text-white pb-4 font-semibold">
+                Reduziert Sorgen und Wasserbedarf
+              </p>
+              <p class="text-2xl text-white font-normal whitespace-normal">
+                Dank Monitoring und intelligenter Steuerung schließt du nicht nur Unterversorgung aus, sondern profitierst auch vom Wasser-Sparpotential einer bedarfsgerechten Tröpfchenbewässerung.
+              </p>
             </div>
           </div>
         </div>
         <!-- Rechter Bereich (2/3) -->
         <div class="image-container">
-          <img src="/showcase/1.png" alt="Showcase Image" class="showcase-image" />
-          <img src="/showcase/2.png" alt="Showcase Image" id="step2" class="showcase-image-hidden mobil-invisible" />
-          <img src="/showcase/3.png" alt="Showcase Image" id="step3" class="showcase-image-hidden mobil-invisible" />
+          <img src="/showcase/1.png" alt="Showcase Image" class="showcase-image">
+          <img id="step2" src="/showcase/2.png" alt="Showcase Image" class="showcase-image-hidden mobil-invisible">
+          <img id="step3" src="/showcase/3.png" alt="Showcase Image" class="showcase-image-hidden mobil-invisible">
           <div class="flex w-full gap-3 flex-col mb-4 z-50 mobil-invisible mt-auto">
             <div class="flex w-full text-lg font-semibold flex-col">
-              <p class="font-normal uppercase py-1 tracking-widest px-10">Monitoring</p>
+              <p class="font-normal uppercase py-1 tracking-widest px-10">
+                Monitoring
+              </p>
               <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
                 <div class="flex flex-col w-1/3">
-                  <p class="">Feuchtigkeit im Pflanzsubstrat</p>
+                  <p class="">
+                    Feuchtigkeit im Pflanzsubstrat
+                  </p>
                 </div>
                 <div id="step2" class="flex flex-col invisible w-1/3">
                   <p>Füllstand, Wassertemperatur, EC-Wert, Ph-Wert</p>
@@ -621,10 +638,14 @@ function cleanupEventListeners() {
               </div>
             </div>
             <div class="flexd text-lg w-full font-semibold flex-col">
-              <p class="font-normal tracking-widest py-1 uppercase px-10">Automatisierung</p>
+              <p class="font-normal tracking-widest py-1 uppercase px-10">
+                Automatisierung
+              </p>
               <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
                 <div class="flex flex-col w-1/3">
-                  <p class="">Bewässerung</p>
+                  <p class="">
+                    Bewässerung
+                  </p>
                 </div>
                 <div id="step2" class="flex flex-col w-1/3 invisible">
                   <p>Nährstoffversorgung, Ph-Management, Wasserbezug</p>
@@ -643,20 +664,30 @@ function cleanupEventListeners() {
         <!-- Linker Bereich (1/3) -->
         <div id="showcase-info2" class="showcase-info bg-secondary">
           <div id="showcase-info-text2" class="showcase-info-text">
-            <p class="text-4xl pb-6 text-white font-semibold">Nährstoffversorgung<br />ohne Kompromisse</p>
+            <p class="text-4xl pb-6 text-white font-semibold">
+              Nährstoffversorgung<br>ohne Kompromisse
+            </p>
             <div class="flex flex-col">
-              <p class="text-2xl text-white pb-4 font-semibold">Tankmonitor</p>
-              <p class="text-2xl text-white font-normal whitespace-normal">Um sichere Automatisierung zu gewährleisten, wird der Nährstofftank zu jeder Zeit durch Radar und Messsonden überwacht.</p>
+              <p class="text-2xl text-white pb-4 font-semibold">
+                Tankmonitor
+              </p>
+              <p class="text-2xl text-white font-normal whitespace-normal">
+                Um sichere Automatisierung zu gewährleisten, wird der Nährstofftank zu jeder Zeit durch Radar und Messsonden überwacht.
+              </p>
             </div>
             <div class="flex flex-col">
-              <p class="text-2xl text-white pb-4 font-semibold">Nährstoffcontroller</p>
-              <p class="text-2xl text-white font-normal whitespace-normal">Drei Komponenten eines Düngemittelsystems und Zwei Ph-Korrerkturlösungen werden bei Bedarf automatisch infundiert.</p>
+              <p class="text-2xl text-white pb-4 font-semibold">
+                Nährstoffcontroller
+              </p>
+              <p class="text-2xl text-white font-normal whitespace-normal">
+                Drei Komponenten eines Düngemittelsystems und Zwei Ph-Korrerkturlösungen werden bei Bedarf automatisch infundiert.
+              </p>
             </div>
           </div>
         </div>
         <!-- Mobilversion Image -->
         <div class="image-container-invisible">
-          <img src="/showcase/2.png" alt="Showcase Image" class="showcase-image" />
+          <img src="/showcase/2.png" alt="Showcase Image" class="showcase-image">
         </div>
       </div>
 
@@ -665,20 +696,28 @@ function cleanupEventListeners() {
         <!-- Linker Bereich (1/3) -->
         <div id="showcase-info3" class="showcase-info bg-secondary">
           <div id="showcase-info-text3" class="showcase-info-text">
-            <p class="text-4xl pb-6 text-white font-semibold">Volle Kontrolle?<br />Kein Problem!</p>
-            <img src="/climatemonitor+plug.png" alt="Showcase Image" class="device-image max-w-sm" />
+            <p class="text-4xl pb-6 text-white font-semibold">
+              Volle Kontrolle?<br>Kein Problem!
+            </p>
+            <img src="/climatemonitor+plug.png" alt="Showcase Image" class="device-image max-w-sm">
             <div class="flex flex-col">
-              <p class="text-2xl text-white pb-4 font-semibold">Ganzjährig bestes Klima</p>
-              <p class="text-2xl text-white font-normal whitespace-normal">Ob Indoor oder im isolierten Gewächshaus, unser System übernimmt die Regulierung des Klimas, abgestimmt auf deine Pflanzen. Unsere SmartPlugs ermöglichen das Einbinden analoger Geräte. Außerdem können smarte Geräte wie Thermostate oder Abluftventilatoren eingebunden werden. </p>
+              <p class="text-2xl text-white pb-4 font-semibold">
+                Ganzjährig bestes Klima
+              </p>
+              <p class="text-2xl text-white font-normal whitespace-normal">
+                Ob Indoor oder im isolierten Gewächshaus, unser System übernimmt die Regulierung des Klimas, abgestimmt auf deine Pflanzen. Unsere SmartPlugs ermöglichen das Einbinden analoger Geräte. Außerdem können smarte Geräte wie Thermostate oder Abluftventilatoren eingebunden werden.
+              </p>
             </div>
           </div>
         </div>
         <!-- Mobilversion Image und Beschreibung -->
         <div class="image-container-invisible">
-          <img src="/showcase/3.png" alt="Showcase Image" class="showcase-image mobil-padding" />
+          <img src="/showcase/3.png" alt="Showcase Image" class="showcase-image mobil-padding">
           <div class="flex w-full gap-3 flex-col mb-4 z-50 mt-auto">
             <div class="flex w-full text-lg font-semibold flex-col">
-              <p class="font-normal uppercase py-1 tracking-widest text-2xl px-10">Monitoring</p>
+              <p class="font-normal uppercase py-1 tracking-widest text-2xl px-10">
+                Monitoring
+              </p>
               <div class="flex flex-row font-medium gap-4 py-2 px-10 text-xl bg-lightblue text-white">
                 <div class="flex flex-col w-1/3">
                   <p>Substratfeuchtigkeit</p>
@@ -698,7 +737,9 @@ function cleanupEventListeners() {
               </div>
             </div>
             <div class="flexd text-lg w-full font-semibold flex-col">
-              <p class="font-normal tracking-widest py-1 uppercase text-2xl px-10">Automatisierung</p>
+              <p class="font-normal tracking-widest py-1 uppercase text-2xl px-10">
+                Automatisierung
+              </p>
               <div class="flex flex-row font-medium gap-4 py-2 px-10 text-xl bg-lightblue text-white">
                 <div class="flex flex-col w-1/3">
                   <p>Bewässerung</p>
@@ -724,64 +765,98 @@ function cleanupEventListeners() {
 
     <section id="benefits" class="flex flex-col text-primary min-h-screen">
       <div class="flex flex-col bg-secondary text-white">
-        <p class="text-4xl font-semibold mt-6 mb-8 text-center justify-top">Vorteile auf einen Blick</p> 
+        <p class="text-4xl font-semibold mt-6 mb-8 text-center justify-top">
+          Vorteile auf einen Blick
+        </p>
       </div>
       <div class="benefits-grid">
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/1.svg" alt="Benefit 1 Image" class="" />
+            <img src="/benefit/1.svg" alt="Benefit 1 Image" class="">
           </div>
-          <p class="text-2xl mt-4 font-bold">Hybrides Monitoring</p>
-          <p class="text-xl mt-1 font-medium">Messung und Auswertung aller relevanten Einflussfaktoren</p>
+          <p class="text-2xl mt-4 font-bold">
+            Hybrides Monitoring
+          </p>
+          <p class="text-xl mt-1 font-medium">
+            Messung und Auswertung aller relevanten Einflussfaktoren
+          </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/2.svg" alt="Benefit 2 Image" class="" />
+            <img src="/benefit/2.svg" alt="Benefit 2 Image" class="">
           </div>
-          <p class="text-2xl mt-4 font-bold">Automatische Versorgung</p>
-          <p class="text-xl mt-1 font-medium">Kabellose, modulare Plug and Play Automatisierung</p>
+          <p class="text-2xl mt-4 font-bold">
+            Automatische Versorgung
+          </p>
+          <p class="text-xl mt-1 font-medium">
+            Kabellose, modulare Plug and Play Automatisierung
+          </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/3.svg" alt="Benefit 3 Image" class="" />
+            <img src="/benefit/3.svg" alt="Benefit 3 Image" class="">
           </div>
-          <p class="text-2xl mt-4 font-bold">Intelligente Gartenassistenz</p>
-          <p class="text-xl mt-1 font-medium">Interaktiv angeleitet, ohne Vorwissen, erfolgreich kultivieren</p>
+          <p class="text-2xl mt-4 font-bold">
+            Intelligente Gartenassistenz
+          </p>
+          <p class="text-xl mt-1 font-medium">
+            Interaktiv angeleitet, ohne Vorwissen, erfolgreich kultivieren
+          </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/4.svg" alt="Benefit 4 Image" class="" />
+            <img src="/benefit/4.svg" alt="Benefit 4 Image" class="">
           </div>
-          <p class="text-2xl mt-4 font-bold">Smarthome Prinzip</p>
-          <p class=" text-xl mt-1 font-medium">Kabellos, flexibel, unkompliziert, erweiterbar, günstig</p>
+          <p class="text-2xl mt-4 font-bold">
+            Smarthome Prinzip
+          </p>
+          <p class=" text-xl mt-1 font-medium">
+            Kabellos, flexibel, unkompliziert, erweiterbar, günstig
+          </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/5.svg" alt="Benefit 5 Image" class="" />
+            <img src="/benefit/5.svg" alt="Benefit 5 Image" class="">
           </div>
-          <p class="text-2xl mt-4 font-bold">Zeitersparnis</p>
-          <p class="text-xl mt-1 font-medium">Weniger Zeit und Mühe, dafür mehr Zeit zum genießen</p>
+          <p class="text-2xl mt-4 font-bold">
+            Zeitersparnis
+          </p>
+          <p class="text-xl mt-1 font-medium">
+            Weniger Zeit und Mühe, dafür mehr Zeit zum genießen
+          </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/6.svg" alt="Benefit 6 Image" class="" />
+            <img src="/benefit/6.svg" alt="Benefit 6 Image" class="">
           </div>
-          <p class="text-2xl mt-4 font-bold">Mehr Ertrag</p>
-          <p class="text-xl mt-1 font-medium">Egal was du ernten willst, wir machen einfach mehr daraus</p>
+          <p class="text-2xl mt-4 font-bold">
+            Mehr Ertrag
+          </p>
+          <p class="text-xl mt-1 font-medium">
+            Egal was du ernten willst, wir machen einfach mehr daraus
+          </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/7.svg" alt="Benefit 7 Image" class="" />
+            <img src="/benefit/7.svg" alt="Benefit 7 Image" class="">
           </div>
-          <p class="text-2xl mt-4 font-bold">Versorgung in Abwesenheit</p>
-          <p class="text-xl mt-1 font-medium">Erfolgreich im Garten, trotz flexiblen Lebensstil</p>
+          <p class="text-2xl mt-4 font-bold">
+            Versorgung in Abwesenheit
+          </p>
+          <p class="text-xl mt-1 font-medium">
+            Erfolgreich im Garten, trotz flexiblen Lebensstil
+          </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/8.svg" alt="Benefit 8 Image" class="" />
+            <img src="/benefit/8.svg" alt="Benefit 8 Image" class="">
           </div>
-          <p class="text-2xl mt-4 font-bold">Keine Sorgen mehr</p>
-          <p class="text-xl mt-1 font-medium">Nichts im Leben ist sicher aber deine Pflanzen sind nah dran</p>
+          <p class="text-2xl mt-4 font-bold">
+            Keine Sorgen mehr
+          </p>
+          <p class="text-xl mt-1 font-medium">
+            Nichts im Leben ist sicher aber deine Pflanzen sind nah dran
+          </p>
         </div>
       </div>
     </section>
@@ -794,8 +869,12 @@ function cleanupEventListeners() {
         <div class="flex flex-col grow items-center">
           <div class="flex flex-col items-start w-60">
             <span class="mb-2 uppercase text-sm">Rechtliches</span>
-            <NuxtLink href="/impressum" class="mb-2 hover:underline">Impressum</NuxtLink>
-            <NuxtLink href="/datenschutz" class="hover:underline">Datenschutz</NuxtLink>
+            <NuxtLink href="/impressum" class="mb-2 hover:underline">
+              Impressum
+            </NuxtLink>
+            <NuxtLink href="/datenschutz" class="hover:underline">
+              Datenschutz
+            </NuxtLink>
           </div>
         </div>
         <div class="flex flex-col grow items-center">
@@ -806,9 +885,11 @@ function cleanupEventListeners() {
           </div>
         </div>
         <div class="flex grow" />
-      </div> 
+      </div>
       <!-- Copyright -->
-      <p class="text-center">&copy; 2025 Plantomio UG</p>
+      <p class="text-center">
+        &copy; 2025 Plantomio UG
+      </p>
     </footer>
   </div>
 </template>
@@ -821,16 +902,16 @@ function cleanupEventListeners() {
     display: flex;
     flex-direction: column;
   }
-  
+
   /* Schwarzes Overlay (fixed, kein Platz im Dokumentenfluss) */
   #black-overlay {
     position: fixed;
-    top: 0; 
+    top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: black;
-    z-index: 9999; 
+    z-index: 9999;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -851,7 +932,7 @@ function cleanupEventListeners() {
     height: 100vh;
     width: 30%;
   }
-  
+
   .hero-image {
   display: block;
   margin: 0 auto;
@@ -867,7 +948,7 @@ function cleanupEventListeners() {
     align-items: top;
     justify-content: center;
   }
-  
+
   .pinned-heading {
     font-size: 2rem;
     font-weight: bold;
@@ -875,7 +956,7 @@ function cleanupEventListeners() {
     transform-origin: center center; /* Für zentrierte Skalierung */
     will-change: transform, opacity;  /* Optimierung für Animationen */
   }
-  
+
   /* Wort-Abschnitt (pinned) */
   .word-section {
     position: relative; /* Notwendig für Pinning */
@@ -883,7 +964,7 @@ function cleanupEventListeners() {
     align-items: center;
     flex-direction: column;
   }
-  
+
   .word-section1 {
     position: relative; /* Notwendig für Pinning */
     display: flex;
@@ -917,27 +998,27 @@ function cleanupEventListeners() {
     opacity: 0; /* Initial versteckt */
     text-transform: uppercase;
   }
-  
+
   .effekt-word2 {
     font-size: 5rem;
     font-weight: 500 ;
     margin-bottom: 60vh;
     transform-origin: center center;
     will-change: transform, opacity;  /* Optimierung für Animationen */
-    opacity: 0; 
+    opacity: 0;
     text-transform: uppercase;
   }
-  
+
   .effekt-word3 {
     font-size: 5rem;
     font-weight: 500 ;
     margin-bottom: 50vh;
     transform-origin: center center;
     will-change: transform, opacity;  /* Optimierung für Animationen */
-    opacity: 0; 
+    opacity: 0;
     text-transform: uppercase;
   }
-  
+
   /* Showcase-Section */
 .showcase-section {
   display: flex;
@@ -1120,7 +1201,5 @@ function cleanupEventListeners() {
     margin: 1vh 2.5rem 3vh 2.5rem; /* zusätzlich */
   }
 
-
 }
  </style>
-  

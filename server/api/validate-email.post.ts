@@ -1,7 +1,7 @@
 // server/api/validate-email.post.ts
 
+import dns from 'node:dns/promises'
 import { defineEventHandler, readBody, sendError } from 'h3'
-import dns from 'dns/promises'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Überprüfe das Format der E-Mail-Adresse
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       return sendError(event, createError({ statusCode: 400, statusMessage: 'Ungültiges E-Mail-Format.' }))
     }
@@ -26,14 +26,17 @@ export default defineEventHandler(async (event) => {
       const mxRecords = await dns.resolveMx(domain)
       if (mxRecords && mxRecords.length > 0) {
         return { message: 'E-Mail-Domain ist gültig.' }
-      } else {
+      }
+      else {
         return sendError(event, createError({ statusCode: 400, statusMessage: 'Die E-Mail-Domain kann keine E-Mails empfangen.' }))
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Fehler beim Auflösen der MX-Records:', error)
       return sendError(event, createError({ statusCode: 400, statusMessage: 'Die E-Mail-Domain kann keine E-Mails empfangen.' }))
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Ein unerwarteter Fehler ist aufgetreten:', error)
     return sendError(event, createError({ statusCode: 500, statusMessage: 'Interner Serverfehler.' }))
   }

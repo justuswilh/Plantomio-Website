@@ -1,11 +1,11 @@
+<script setup>
+defineProps({
+  text: String,
+})
+</script>
+
 <template>
-    <footer>
-      <p>{{ text }}</p>
-    </footer>
-  </template>
-  
-  <script setup>
-  const props = defineProps({
-    text: String
-  })
-  </script>
+  <footer>
+    <p>{{ text }}</p>
+  </footer>
+</template>

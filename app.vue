@@ -1,5 +1,6 @@
 <script setup>
 import CookieBanner from '~/components/CookieBanner.vue'
+
 const { $cookies } = useNuxtApp()
 </script>
 
@@ -48,5 +49,4 @@ const { $cookies } = useNuxtApp()
   --ui-warning: var(--ui-color-warning-500);
   --ui-error: var(--ui-color-error-500);
 }
-
 </style>

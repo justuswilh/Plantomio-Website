@@ -20,7 +20,6 @@ Make sure to install the dependencies:
 pnpx prisma generate
 ```
 
-
 ## Development Server
 
 Start the development server on http://localhost:3000

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
-import * as v from 'valibot'
 import type { FormSubmitEvent } from '#ui/types'
+import * as v from 'valibot'
+import { reactive } from 'vue'
 
 // Definiere das Validierungsschema
 const schema = v.object({
@@ -65,7 +65,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     }
 
     // Wenn Validierung erfolgreich ist, setze alle Fehler zurück
-    Object.keys(errors).forEach(key => {
+    Object.keys(errors).forEach((key) => {
       errors[key as keyof Schema] = null
     })
 
@@ -97,7 +97,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     form.name = ''
     form.nachname = ''
     form.email = ''
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Ein unerwarteter Fehler ist aufgetreten:', error)
     errors.email = 'Ein Fehler ist aufgetreten. Bitte versuche es später erneut.'
   }
@@ -113,10 +114,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     </div>
     <Progress class="mt-10 mb-2" />
     <p class="text-xl leading-loose font-semibold mt-4 mb-4 text-center justify-top">
-      Unsere Beta Phase hat begonnen! <br />
+      Unsere Beta Phase hat begonnen! <br>
       Interessierte können bereits jetzt die Vorteile smarter Pflanzenversorgung
-      erfahren. <br />
-      Unser Newsletter hält dich auf dem Laufenden ohne zu stressen. <br />
+      erfahren. <br>
+      Unser Newsletter hält dich auf dem Laufenden ohne zu stressen. <br>
       Wir schreiben dir nur bei relevanten Fortschritten.
     </p>
 
@@ -132,27 +133,35 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <UCheckbox v-model="form.betaProgram" label="Interesse am Beta-Programm" size="xl" />
           </UFormField>
         </div>
-        <p v-if="errors.text" class="text-red-500 text-sm text-center mt-1">{{ errors.text }}</p>
+        <p v-if="errors.text" class="text-red-500 text-sm text-center mt-1">
+          {{ errors.text }}
+        </p>
         <div class="text-inpust-fields gap-6 mt-6">
           <!-- Name -->
           <UFormField label="Name" name="name" size="xl" required>
             <UInput v-model="form.name" placeholder="Ihr Vorname" />
             <!-- Fehleranzeige für Name -->
-            <p v-if="errors.name" class="text-red-500 static text-sm mt-1">{{ errors.name }}</p>
+            <p v-if="errors.name" class="text-red-500 static text-sm mt-1">
+              {{ errors.name }}
+            </p>
           </UFormField>
 
           <!-- Nachname -->
           <UFormField label="Nachname" size="xl" name="nachname" required>
             <UInput v-model="form.nachname" placeholder="Ihr Nachname" />
             <!-- Fehleranzeige für Nachname -->
-            <p v-if="errors.nachname" class="text-red-500 text-sm mt-1">{{ errors.nachname }}</p>
+            <p v-if="errors.nachname" class="text-red-500 text-sm mt-1">
+              {{ errors.nachname }}
+            </p>
           </UFormField>
 
           <!-- E-Mail -->
           <UFormField label="E-Mail" name="email" size="xl" required>
             <UInput v-model="form.email" type="email" placeholder="Ihre E-Mail-Adresse" />
             <!-- Fehleranzeige für E-Mail -->
-            <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
+            <p v-if="errors.email" class="text-red-500 text-sm mt-1">
+              {{ errors.email }}
+            </p>
           </UFormField>
         </div>
 
@@ -164,11 +173,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         </div>
         <!-- Bestätigungsnachricht -->
         <p v-if="confirmationMessage.text" class="text-primary text-xl mt-4 text-center">
-            {{ confirmationMessage.text }}
+          {{ confirmationMessage.text }}
         </p>
         <p class="text-center mt-8">
           Mit dem Absenden des Formulars erkläre ich mich mit den
-          <NuxtLink to="/datenschutz" class="font-medium hover:underline">Datenschutzbestimmungen</NuxtLink> einverstanden.
+          <NuxtLink to="/datenschutz" class="font-medium hover:underline">
+            Datenschutzbestimmungen
+          </NuxtLink> einverstanden.
         </p>
       </UForm>
     </div>

@@ -1,7 +1,8 @@
-// server/api/send-form.post.ts
-import { defineEventHandler, readBody, sendError, createError } from 'h3'
-import nodemailer from 'nodemailer'
+import process from 'node:process'
 import { PrismaClient } from '@prisma/client'
+// server/api/send-form.post.ts
+import { createError, defineEventHandler, readBody, sendError } from 'h3'
+import nodemailer from 'nodemailer'
 
 const prisma = new PrismaClient()
 
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
     if (!name || !nachname || !email) {
       return sendError(
         event,
-        createError({ statusCode: 400, statusMessage: 'Name, Nachname und E-Mail sind erforderlich.' })
+        createError({ statusCode: 400, statusMessage: 'Name, Nachname und E-Mail sind erforderlich.' }),
       )
     }
 
@@ -22,14 +23,14 @@ export default defineEventHandler(async (event) => {
     if (!newsletter && !betaProgram) {
       return sendError(
         event,
-        createError({ statusCode: 400, statusMessage: 'Mindestens eine Checkbox (Newsletter oder Beta Programm) muss aktiviert sein.' })
+        createError({ statusCode: 400, statusMessage: 'Mindestens eine Checkbox (Newsletter oder Beta Programm) muss aktiviert sein.' }),
       )
     }
 
     // 2) E-Mail versenden
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587', 10),
+      port: Number.parseInt(process.env.SMTP_PORT || '587', 10),
       secure: process.env.SMTP_PORT === '465',
       auth: {
         user: process.env.SMTP_USER,
@@ -75,14 +76,17 @@ export default defineEventHandler(async (event) => {
 
     if (newsletter && betaProgram) {
       message += ' Wir werden dich umgehend kontaktieren, um eine Teilnahme am Beta Programm zu besprechen.'
-    } else if (betaProgram) {
+    }
+    else if (betaProgram) {
       message += ' Wir werden dich umgehend kontaktieren, um eine Teilnahme am Beta Programm zu besprechen.'
-    } else if (newsletter) {
+    }
+    else if (newsletter) {
       message = 'Vielen Dank für dein Interesse am Newsletter!'
     }
 
     return { message }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Fehler beim Senden oder Speichern:', error)
     return sendError(event, createError({ statusCode: 500, statusMessage: 'Fehler beim Senden oder Speichern.' }))
   }

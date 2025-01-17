@@ -1,6 +1,7 @@
 {
-  "private": true,
   "type": "module",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
   "scripts": {
     "prisma:generate": "prisma generate",
     "prebuild": "pnpx prisma generate",
@@ -8,7 +9,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@antfu/eslint-config": "^3.14.0",
@@ -39,10 +41,11 @@
     "vue-tsc": "^2.2.0",
     "vue3-cookies": "^1.0.6"
   },
-  "packageManager": "pnpm@9.15.4",
   "devDependencies": {
+    "@antfu/eslint-config": "^3.14.0",
     "@iconify-json/lucide": "^1.2.23",
     "@iconify-json/material-symbols": "^1.2.12",
+    "eslint": "^9.18.0",
     "prisma": "^6.2.1"
   }
 }

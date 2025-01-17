@@ -4,7 +4,7 @@ import { ref } from 'vue'
 // Gemeinsamer Zustand außerhalb der Funktion
 const animationCompleted = ref(false)
 
-export const useCookieBannerState = () => {
+export function useCookieBannerState() {
   const setAnimationCompleted = () => {
     animationCompleted.value = true
   }
