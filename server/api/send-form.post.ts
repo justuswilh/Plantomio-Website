@@ -32,8 +32,8 @@ export default defineEventHandler(async (event) => {
       port: parseInt(process.env.SMTP_PORT || '587', 10),
       secure: process.env.SMTP_PORT === '465',
       auth: {
-        user: process.env.SMTP_USER_NO_REPLY,
-        pass: process.env.SMTP_PASS_NO_REPLY,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
     })
 

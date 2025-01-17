@@ -2,6 +2,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prisma:generate": "prisma generate",
+    "prebuild": "pnpx prisma generate",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",

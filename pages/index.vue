@@ -1,20 +1,31 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import Contact from '~/components/Contact.vue'
 import ShowcaseCarousel from '~/components/ShowcaseCarousel.vue'
 
+// Array zur Speicherung der ScrollTrigger-Instanzen
+const scrollTriggers: ScrollTrigger[] = []
+
+// Variable zur Speicherung der MatchMedia-Instanz
+let mm: ReturnType<typeof ScrollTrigger.matchMedia>
+
+// Event-Handler Referenzen für die Bereinigung
+let onWheelHandler: (e: WheelEvent) => void
+let onTouchMoveHandler: (e: TouchEvent) => void
+let onWheel2Handler: (e: WheelEvent) => void
+let onTouchMove2Handler: (e: TouchEvent) => void
+
 onMounted(() => {
-  gsap.registerPlugin(ScrollTrigger)
-  gsap.registerPlugin(ScrollToPlugin)
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 
   // Globale Animationen
   initGlobalAnimations()
 
-  // ScrollTrigger-Breakpoints
-  ScrollTrigger.matchMedia({
+  // ScrollTrigger-Breakpoints mit matchMedia
+  mm = ScrollTrigger.matchMedia({
     '(min-width: 769px)': () => {
       initDesktopTriggers()
     },
@@ -26,7 +37,21 @@ onMounted(() => {
   // Idle-Auto-Scroll aktivieren
   initIdleAutoScroll()
 
+  // Zweiten Idle-Auto-Scroll aktivieren
   initIdleAutoScrollToBenefits()
+})
+
+onUnmounted(() => {
+  // Bereinigen aller ScrollTrigger-Instanzen
+  scrollTriggers.forEach(trigger => trigger.kill())
+  
+  // Bereinigen der matchMedia-Kontexte
+  if (mm && typeof mm.revert === 'function') {
+    mm.revert()
+  }
+
+  // Entfernen der globalen Event-Listener
+  cleanupEventListeners()
 })
 
 /**
@@ -34,7 +59,7 @@ onMounted(() => {
  *  1) ERSTER AUTOSCROLL (wie gehabt)
  *  ----------------------------
  */
- function initIdleAutoScroll() {
+function initIdleAutoScroll() {
   const INACTIVITY_LIMIT = 2000 // z.B. 2s
   let inactivityTimer: number
   let autoScrolling = false
@@ -42,13 +67,14 @@ onMounted(() => {
   let autoScrollAllowed = true
 
   // Keyframe Trigger, der den ersten Autoscroll deaktiviert
-  ScrollTrigger.create({
+  const trigger1 = ScrollTrigger.create({
     trigger: '#showcase-section',
     start: 'top top',
     onEnter: () => {
       disableAutoScroll()
     },
   })
+  scrollTriggers.push(trigger1)
 
   function disableAutoScroll() {
     autoScrollAllowed = false
@@ -59,8 +85,8 @@ onMounted(() => {
       autoScrolling = false
     }
 
-    window.removeEventListener('wheel', onWheel, { passive: true } as AddEventListenerOptions)
-    window.removeEventListener('touchmove', onTouchMove, { passive: true } as AddEventListenerOptions)
+    window.removeEventListener('wheel', onWheelHandler, { passive: true })
+    window.removeEventListener('touchmove', onTouchMoveHandler, { passive: true })
   }
 
   function resetTimer() {
@@ -83,7 +109,7 @@ onMounted(() => {
     }, INACTIVITY_LIMIT)
   }
 
-  function onWheel(e: WheelEvent) {
+  onWheelHandler = (e: WheelEvent) => {
     if (Math.abs(e.deltaY) > 0) {
       resetTimer()
       if (autoScrolling && autoScrollTween?.isActive()) {
@@ -95,7 +121,7 @@ onMounted(() => {
     }
   }
 
-  function onTouchMove() {
+  onTouchMoveHandler = () => {
     resetTimer()
     if (autoScrolling && autoScrollTween?.isActive()) {
       autoScrollTween.kill()
@@ -105,8 +131,8 @@ onMounted(() => {
     }
   }
 
-  window.addEventListener('wheel', onWheel, { passive: true })
-  window.addEventListener('touchmove', onTouchMove, { passive: true })
+  window.addEventListener('wheel', onWheelHandler, { passive: true })
+  window.addEventListener('touchmove', onTouchMoveHandler, { passive: true })
 
   // Timer beim Start aktivieren
   resetTimer()
@@ -117,360 +143,389 @@ onMounted(() => {
  *     Aktivierung erst, wenn bestimmter Keyframe erreicht.
  *     Deaktivierung, wenn der Keyframe wieder verlassen wird.
  */
- function initIdleAutoScrollToBenefits() {
-  const INACTIVITY_LIMIT_2 = 10000;
-  let inactivityTimer2: number;
-  let autoScrolling2 = false;
-  let autoScrollTween2: gsap.core.Tween | null = null;
-  let autoScrollAllowed2 = false; // Zu Beginn nicht erlaubt
+function initIdleAutoScrollToBenefits() {
+  const INACTIVITY_LIMIT_2 = 10000
+  let inactivityTimer2: number
+  let autoScrolling2 = false
+  let autoScrollTween2: gsap.core.Tween | null = null
+  let autoScrollAllowed2 = false // Zu Beginn nicht erlaubt
 
-  // ===== ScrollTrigger, der den 2. Autoscroll "freigibt" und auch wieder deaktiviert =====
-  ScrollTrigger.create({
+  // ScrollTrigger, der den 2. Autoscroll "freigibt"
+  const trigger2 = ScrollTrigger.create({
     trigger: '#showcase-section',
     start: 'top+=-10 top',
-    // Sobald wir #showcase-section erreichen (von oben nach unten):
     onEnter: () => {
-      autoScrollAllowed2 = true;
-      resetTimer2();
+      autoScrollAllowed2 = true
+      resetTimer2()
     },
-  });
+    onLeaveBack: () => {
+      autoScrollAllowed2 = false
+      if (autoScrolling2 && autoScrollTween2?.isActive()) {
+        autoScrollTween2.kill()
+        autoScrollTween2 = null
+        autoScrolling2 = false
+      }
+    },
+  })
+  scrollTriggers.push(trigger2)
 
-  ScrollTrigger.create({
+  // ScrollTrigger, der den 2. Autoscroll deaktiviert
+  const trigger3 = ScrollTrigger.create({
     trigger: '#showcaseCarousel',
     start: 'top top',
     onEnter: () => {
       disableAutoScroll2()
     },
+    onEnterBack: () => {
+      disableAutoScroll2()
+    },
   })
+  scrollTriggers.push(trigger3)
 
   // Deaktivierung des zweiten Autoscrolls
   function disableAutoScroll2() {
-    autoScrollAllowed2 = false;
+    autoScrollAllowed2 = false
 
     // Falls gerade ein Tween läuft, abbrechen
     if (autoScrolling2 && autoScrollTween2?.isActive()) {
-      autoScrollTween2.kill();
-      autoScrollTween2 = null;
-      autoScrolling2 = false;
+      autoScrollTween2.kill()
+      autoScrollTween2 = null
+      autoScrolling2 = false
     }
 
     // Event-Listener entfernen
-    window.removeEventListener('wheel', onWheel2, { passive: true } as AddEventListenerOptions);
-    window.removeEventListener('touchmove', onTouchMove2, { passive: true } as AddEventListenerOptions);
+    window.removeEventListener('wheel', onWheel2Handler, { passive: true })
+    window.removeEventListener('touchmove', onTouchMove2Handler, { passive: true })
   }
 
   // Timer zurücksetzen
   function resetTimer2() {
-    if (!autoScrollAllowed2) return;
+    if (!autoScrollAllowed2) return
 
-    clearTimeout(inactivityTimer2);
+    clearTimeout(inactivityTimer2)
     inactivityTimer2 = window.setTimeout(() => {
       if (!autoScrolling2 && autoScrollAllowed2) {
-        autoScrolling2 = true;
+        autoScrolling2 = true
         autoScrollTween2 = gsap.to(window, {
           scrollTo: '#showcaseCarousel',
           duration: 40,
           ease: 'power0.in',
           onComplete: () => {
-            autoScrolling2 = false;
-            autoScrollTween2 = null;
+            autoScrolling2 = false
+            autoScrollTween2 = null
           },
-        });
+        })
       }
-    }, INACTIVITY_LIMIT_2);
+    }, INACTIVITY_LIMIT_2)
   }
 
-  // Läuft, sobald ein Wheel-Event kommt
-  function onWheel2(e: WheelEvent) {
+  onWheel2Handler = (e: WheelEvent) => {
     if (Math.abs(e.deltaY) > 0) {
-      resetTimer2();
-      interruptAutoScroll2();
+      resetTimer2()
+      interruptAutoScroll2()
     }
   }
 
-  // Läuft, sobald ein TouchMove-Event kommt
-  function onTouchMove2() {
-    resetTimer2();
-    interruptAutoScroll2();
+  onTouchMove2Handler = () => {
+    resetTimer2()
+    interruptAutoScroll2()
   }
 
-  // Löst einen laufenden Autoscroll-Tween ab
   function interruptAutoScroll2() {
     if (autoScrolling2 && autoScrollTween2?.isActive()) {
-      autoScrollTween2.kill();
-      autoScrollTween2 = null;
-      autoScrolling2 = false;
-      gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 });
+      autoScrollTween2.kill()
+      autoScrollTween2 = null
+      autoScrolling2 = false
+      gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
     }
   }
 
-  // Event Listener
-  window.addEventListener('wheel', onWheel2, { passive: true });
-  window.addEventListener('touchmove', onTouchMove2, { passive: true });
+  window.addEventListener('wheel', onWheel2Handler, { passive: true })
+  window.addEventListener('touchmove', onTouchMove2Handler, { passive: true })
 }
 
 function initGlobalAnimations() {
-    // Overlay Animation
-    gsap.set('#black-overlay', { autoAlpha: 1 })
-    gsap.to('#black-overlay', {
-      autoAlpha: 0,
-      duration: 1.2,
-      delay: 0.2
-    })
+  // Overlay Animation
+  gsap.set('#black-overlay', { autoAlpha: 1 })
+  gsap.to('#black-overlay', {
+    autoAlpha: 0,
+    duration: 1.2,
+    delay: 0.2,
+  })
 
-    gsap.fromTo('#hero-image',
-      { y: '20%', autoAlpha: 0 },
-      { y: '0%', autoAlpha: 1, duration: 1.2, delay: 0.2 }
-    )
-  }
+  gsap.fromTo(
+    '#hero-image',
+    { y: '20%', autoAlpha: 0 },
+    { y: '0%', autoAlpha: 1, duration: 1.2, delay: 0.2 }
+  )
+}
 
-  function initMobileTriggers() {
-    // ScrollTrigger für #effekt-word1
-    ScrollTrigger.create({
-      trigger: '#word-section1',
-      start: 'top+=-100 center',
-      end: 'bottom+=-100 center',
-      pin: true,
-      onEnter: () => {
-              gsap.set('#pinned-heading', { autoAlpha: 0 });
-              gsap.set('#effekt-word1', { autoAlpha: 1 });
-              },
-      onEnterBack: () =>  {
-              gsap.set('#pinned-heading', { autoAlpha: 0 });
-              gsap.set('#effekt-word1', { autoAlpha: 1 });
-              },
-      onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
-    });
+function initMobileTriggers() {
+  // ScrollTrigger für #effekt-word1
+  const trigger1 = ScrollTrigger.create({
+    trigger: '#word-section1',
+    start: 'top+=-100 center',
+    end: 'bottom+=-100 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#pinned-heading', { autoAlpha: 0 })
+      gsap.set('#effekt-word1', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#pinned-heading', { autoAlpha: 0 })
+      gsap.set('#effekt-word1', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger1)
 
-    // ScrollTrigger für #effekt-word2
-    ScrollTrigger.create({
-      trigger: '#word-section2',
-      start: 'top+=-100 center',
-      end: 'bottom+=-100 center',
-      pin: true,
-      onEnter: () => {
-        gsap.set('#effekt-word1', { autoAlpha: 0 });
-        gsap.set('#effekt-word2', { autoAlpha: 1 });
-      },
-      onEnterBack: () => {
-        gsap.set('#effekt-word1', { autoAlpha: 0 });
-        gsap.set('#effekt-word2', { autoAlpha: 1 });
-      },
-      onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
-    });
+  // ScrollTrigger für #effekt-word2
+  const trigger2 = ScrollTrigger.create({
+    trigger: '#word-section2',
+    start: 'top+=-100 center',
+    end: 'bottom+=-100 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#effekt-word1', { autoAlpha: 0 })
+      gsap.set('#effekt-word2', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#effekt-word1', { autoAlpha: 0 })
+      gsap.set('#effekt-word2', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger2)
 
-    // ScrollTrigger für #effekt-word3
-    ScrollTrigger.create({
-      trigger: '#word-section3',
-      start: 'top+=-100 center',
-      end: 'bottom+=-100 center',
-      pin: true,
-      onEnter: () => {
-        gsap.set('#effekt-word2', { autoAlpha: 0 });
-        gsap.set('#effekt-word3', { autoAlpha: 1 });
-      },
-      onEnterBack: () => {
-        gsap.set('#effekt-word2', { autoAlpha: 0 });
-        gsap.set('#effekt-word3', { autoAlpha: 1 });
-      },
-      onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
-    });
-  }
+  // ScrollTrigger für #effekt-word3
+  const trigger3 = ScrollTrigger.create({
+    trigger: '#word-section3',
+    start: 'top+=-100 center',
+    end: 'bottom+=-100 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#effekt-word2', { autoAlpha: 0 })
+      gsap.set('#effekt-word3', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#effekt-word2', { autoAlpha: 0 })
+      gsap.set('#effekt-word3', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger3)
+}
 
-  function initDesktopTriggers() {
-
-    // Animation für #pinned-heading
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: '#pinned-heading-section',
-        start: 'top-=35 center',
-        end: 'bottom+=50 center',
-        pin: true,
-        scrub: true,
-        onEnterBack: () => {
-          gsap.set('#pinned-heading', { autoAlpha: 1 });
-        },
-      }
-    })
-    .fromTo(
-      '#pinned-heading',
-      { scale: 1 },
-      { scale: 1.2, duration: 0.2 }
-    )
-
-    // ScrollTrigger für #effekt-word1
-    ScrollTrigger.create({
-      trigger: '#word-section1',
-      start: 'top+=50 center',
+function initDesktopTriggers() {
+  // Animation für #pinned-heading
+  const timeline1 = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#pinned-heading-section',
+      start: 'top-=35 center',
       end: 'bottom+=50 center',
       pin: true,
-      onEnter: () => {
-              gsap.set('#pinned-heading', { autoAlpha: 0 });
-              gsap.set('#effekt-word1', { autoAlpha: 1 });
-              },
-      onEnterBack: () =>  {
-              gsap.set('#pinned-heading', { autoAlpha: 0 });
-              gsap.set('#effekt-word1', { autoAlpha: 1 });
-              },
-      onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
-    });
-
-    // ScrollTrigger für #effekt-word2
-    ScrollTrigger.create({
-      trigger: '#word-section2',
-      start: 'top+=50 center',
-      end: 'bottom+=50 center',
-      pin: true,
-      onEnter: () => {
-        gsap.set('#effekt-word1', { autoAlpha: 0 });
-        gsap.set('#effekt-word2', { autoAlpha: 1 });
-      },
-      onEnterBack: () => {
-        gsap.set('#effekt-word1', { autoAlpha: 0 });
-        gsap.set('#effekt-word2', { autoAlpha: 1 });
-      },
-      onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
-    });
-
-    // ScrollTrigger für #effekt-word3
-    ScrollTrigger.create({
-      trigger: '#word-section3',
-      start: 'top+=50 center',
-      end: 'bottom+=50 center',
-      pin: true,
-      onEnter: () => {
-        gsap.set('#effekt-word2', { autoAlpha: 0 });
-        gsap.set('#effekt-word3', { autoAlpha: 1 });
-      },
-      onEnterBack: () => {
-        gsap.set('#effekt-word2', { autoAlpha: 0 });
-        gsap.set('#effekt-word3', { autoAlpha: 1 });
-      },
-      onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
-    });
-
-    // Ausklappen von #showcase-info1
-    ScrollTrigger.create({
-      trigger: '#showcase-section',
-      start: 'top+=200 center',
-      end: 'bottom+=50 center',
       scrub: true,
-      onEnter: () => {
-        gsap.to('#showcase-info1', {
-          x: 0, 
-          duration: 1, 
-          ease: 'power2.out' 
-        });
+      onEnterBack: () => {
+        gsap.set('#pinned-heading', { autoAlpha: 1 })
       },
-      onLeaveBack: () => {
-        gsap.to('#showcase-info1', {
-          x: -800, 
-          duration: 1,
-          ease: 'power2.in'
-        });
-      }
-    });
+    },
+  })
+  timeline1.fromTo(
+    '#pinned-heading',
+    { scale: 1 },
+    { scale: 1.2, duration: 0.2 }
+  )
+  scrollTriggers.push(timeline1.scrollTrigger)
 
-    // #effekt-word3 schneller bewegen
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: '#showcase-section',
-        start: 'top+=300 center',
-        end: 'top+=600 center',
-        scrub: true,
-      }
-    })
-    .fromTo(
-      '#effekt-word3',
-      { y: 0 },
-      { y: -200, duration: 5 }
-    )
+  // ScrollTrigger für #effekt-word1
+  const trigger1 = ScrollTrigger.create({
+    trigger: '#word-section1',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#pinned-heading', { autoAlpha: 0 })
+      gsap.set('#effekt-word1', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#pinned-heading', { autoAlpha: 0 })
+      gsap.set('#effekt-word1', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger1)
 
-    // Showcase-Content 1 pinnen 
-    ScrollTrigger.create({
+  // ScrollTrigger für #effekt-word2
+  const trigger2 = ScrollTrigger.create({
+    trigger: '#word-section2',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#effekt-word1', { autoAlpha: 0 })
+      gsap.set('#effekt-word2', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#effekt-word1', { autoAlpha: 0 })
+      gsap.set('#effekt-word2', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger2)
+
+  // ScrollTrigger für #effekt-word3
+  const trigger3 = ScrollTrigger.create({
+    trigger: '#word-section3',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#effekt-word2', { autoAlpha: 0 })
+      gsap.set('#effekt-word3', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#effekt-word2', { autoAlpha: 0 })
+      gsap.set('#effekt-word3', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger3)
+
+  // Ausklappen von #showcase-info1
+  const trigger4 = ScrollTrigger.create({
+    trigger: '#showcase-section',
+    start: 'top+=200 center',
+    end: 'bottom+=50 center',
+    scrub: true,
+    onEnter: () => {
+      gsap.to('#showcase-info1', {
+        x: 0,
+        duration: 1,
+        ease: 'power2.out',
+      })
+    },
+    onLeaveBack: () => {
+      gsap.to('#showcase-info1', {
+        x: -800,
+        duration: 1,
+        ease: 'power2.in',
+      })
+    },
+  })
+  scrollTriggers.push(trigger4)
+
+  // #effekt-word3 schneller bewegen
+  const timeline2 = gsap.timeline({
+    scrollTrigger: {
       trigger: '#showcase-section',
-      start: 'top top', 
-      end: 'bottom top', 
-      pin: '#showcase-content1',
-      pinSpacing: false,
+      start: 'top+=300 center',
+      end: 'top+=600 center',
       scrub: true,
-  });
+    },
+  })
+  timeline2.fromTo(
+    '#effekt-word3',
+    { y: 0 },
+    { y: -200, duration: 5 }
+  )
+  scrollTriggers.push(timeline2.scrollTrigger)
 
-    // Showcase-Content 2 pinnen und einblenden
-  ScrollTrigger.create({
-      trigger: '#showcase-content2',
-      start: 'top top',
-      pin: '#showcase-content2',
-      pinSpacing: false,
-      onEnter: () => {
-        gsap.to('#showcase-info2', {
-          x: 0, // Entfernt die translateX(-200px) Transformation
-          duration: 1, // Dauer der Animation in Sekunden
-          ease: 'power2.out' // Easing-Funktion für eine sanfte Animation
-        });
-        gsap.to('#step2', {
-          autoAlpha: 1,
-          duration: 1,
-          ease: 'power2.out'
-        });
-      },
-      onLeaveBack: () => {
-        gsap.to('#showcase-info2', {
-          x: -800, // Setzt die translateX zurück
-          duration: 0.6,
-          ease: 'power2.in'
-        });
-        gsap.to('#step2', {
-          autoAlpha: 0,
-          duration: 0.6,
-          ease: 'power2.in'
-        });
-      },
-    });
+  // Showcase-Content 1 pinnen
+  const trigger5 = ScrollTrigger.create({
+    trigger: '#showcase-section',
+    start: 'top top',
+    end: 'bottom top',
+    pin: '#showcase-content1',
+    pinSpacing: false,
+    scrub: true,
+  })
+  scrollTriggers.push(trigger5)
 
-    // Showcase-Content 1 pinnen 
-  ScrollTrigger.create({
-      trigger: '#showcase-content3',
-      start: 'top top', 
-      end: 'bottom top', 
-      pin: '#showcase-content2',
-      pinSpacing: false,
-  });
+  // Showcase-Content 2 pinnen und einblenden
+  const trigger6 = ScrollTrigger.create({
+    trigger: '#showcase-content2',
+    start: 'top top',
+    pin: '#showcase-content2',
+    pinSpacing: false,
+    onEnter: () => {
+      gsap.to('#showcase-info2', {
+        x: 0,
+        duration: 1,
+        ease: 'power2.out',
+      })
+      gsap.to('#step2', {
+        autoAlpha: 1,
+        duration: 1,
+        ease: 'power2.out',
+      })
+    },
+    onLeaveBack: () => {
+      gsap.to('#showcase-info2', {
+        x: -800,
+        duration: 0.6,
+        ease: 'power2.in',
+      })
+      gsap.to('#step2', {
+        autoAlpha: 0,
+        duration: 0.6,
+        ease: 'power2.in',
+      })
+    },
+  })
+  scrollTriggers.push(trigger6)
 
+  // Showcase-Content 3 pinnen und einblenden
+  const trigger7 = ScrollTrigger.create({
+    trigger: '#showcase-content3',
+    start: 'top top',
+    end: 'bottom top',
+    pin: true,
+    pinSpacing: false,
+    onEnter: () => {
+      gsap.to('#showcase-info3', {
+        x: 0,
+        duration: 1,
+        ease: 'power2.out',
+      })
+      gsap.to('#step3', {
+        autoAlpha: 1,
+        duration: 1,
+        ease: 'power2.out',
+      })
+    },
+    onLeaveBack: () => {
+      gsap.to('#showcase-info3', {
+        x: -800,
+        duration: 0.6,
+        ease: 'power2.in',
+      })
+      gsap.to('#step3', {
+        autoAlpha: 0,
+        duration: 0.6,
+        ease: 'power2.in',
+      })
+    },
+  })
+  scrollTriggers.push(trigger7)
+}
 
-      // Showcase-Content 3 pinnen und einblenden
-  ScrollTrigger.create({
-      trigger: '#showcase-content3',
-      start: 'top top',
-      end: 'bottom top',
-      pin: true,
-      pinSpacing: false,
-      onEnter: () => {
-        gsap.to('#showcase-info3', {
-          x: 0, // Entfernt die translateX(-200px) Transformation
-          duration: 1, // Dauer der Animation in Sekunden
-          ease: 'power2.out' // Easing-Funktion für eine sanfte Animation
-        });
-        gsap.to('#step3', {
-          autoAlpha: 1,
-          duration: 1,
-          ease: 'power2.out'
-        });
-      },
-      onLeaveBack: () => {
-        gsap.to('#showcase-info3', {
-          x: -800, // Setzt die translateX zurück
-          duration: 0.6,
-          ease: 'power2.in'
-        });
-        gsap.to('#step3', {
-          autoAlpha: 0,
-          duration: 0.6,
-          ease: 'power2.in'
-        });
-      },
-    });
+/**
+ * Funktion zum Entfernen der globalen Event-Listener
+ */
+function cleanupEventListeners() {
+  if (onWheelHandler) {
+    window.removeEventListener('wheel', onWheelHandler, { passive: true })
   }
+  if (onTouchMoveHandler) {
+    window.removeEventListener('touchmove', onTouchMoveHandler, { passive: true })
+  }
+  if (onWheel2Handler) {
+    window.removeEventListener('wheel', onWheel2Handler, { passive: true })
+  }
+  if (onTouchMove2Handler) {
+    window.removeEventListener('touchmove', onTouchMove2Handler, { passive: true })
+  }
+}
 </script>
 
 <template>
@@ -729,14 +784,14 @@ function initGlobalAnimations() {
         <div class="flex flex-col grow items-center">
           <div class="flex flex-col items-start w-60">
             <span class="mb-2 uppercase text-sm">Rechtliches</span>
-            <NuxtLink href="https://plantomio.com/impressum" class="mb-2 hover:underline">Impressum</NuxtLink>
-            <NuxtLink href="https://plantomio.com/datenschutz" class="hover:underline">Datenschutz</NuxtLink>
+            <NuxtLink href="/impressum" class="mb-2 hover:underline">Impressum</NuxtLink>
+            <NuxtLink href="/datenschutz" class="hover:underline">Datenschutz</NuxtLink>
           </div>
         </div>
         <div class="flex flex-col grow items-center">
           <div class="flex flex-col items-start w-60">
             <span class="mb-2 uppercase text-sm">Kontakt</span>
-            <a href="mailto:kontakt@plantomio.com" class="mb-2 hover:underline">team@plantomio.de</a>
+            <a href="mailto:team@plantomio.de" class="mb-2 hover:underline">team@plantomio.de</a>
             <a class="">+49 157 87351403</a>
           </div>
         </div>

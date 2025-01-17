@@ -11,6 +11,16 @@ Make sure to install the dependencies:
 pnpm install
 ```
 
+## Prisma Client generieren
+
+Make sure to install the dependencies:
+
+```bash
+# pnpm
+pnpx prisma generate
+```
+
+
 ## Development Server
 
 Start the development server on http://localhost:3000
