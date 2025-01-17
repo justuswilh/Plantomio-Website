@@ -5,12 +5,16 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import Contact from '~/components/Contact.vue'
 import ShowcaseCarousel from '~/components/ShowcaseCarousel.vue'
+import { useCookieBannerState } from '~/composables/useCookieBannerState'
 
 // Array zur Speicherung der ScrollTrigger-Instanzen
 const scrollTriggers: ScrollTrigger[] = []
 
 // Variable zur Speicherung der MatchMedia-Instanz
 let mm: ReturnType<typeof ScrollTrigger.matchMedia>
+
+// Variable für Cookie-Banner-Aktivierung
+const { setAnimationCompleted } = useCookieBannerState()
 
 // Event-Handler Referenzen für die Bereinigung
 let onWheelHandler: (e: WheelEvent) => void
@@ -438,6 +442,9 @@ function initDesktopTriggers() {
     pin: '#showcase-content1',
     pinSpacing: false,
     scrub: true,
+    onEnter: () => {
+      setAnimationCompleted()
+    },
   })
   scrollTriggers.push(trigger5)
 
@@ -529,6 +536,9 @@ function cleanupEventListeners() {
 </script>
 
 <template>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  </head>
   <div class="scroll-container">
     
     <!-- 1) Schwarzes Overlay (fixed) -->
@@ -556,7 +566,7 @@ function cleanupEventListeners() {
     >
       <h1 id="pinned-heading" class="pinned-heading">
         Automatische Versorgung für deine Pflanzen!<br />
-        Aber wie?
+        Aber wie?asdfadf a
       </h1>
     </section>
 
@@ -806,6 +816,7 @@ function cleanupEventListeners() {
 <style scoped>
   /* Container-Stile */
   .scroll-container {
+    width: 100%;
     position: relative;
     display: flex;
     flex-direction: column;

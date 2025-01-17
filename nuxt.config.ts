@@ -11,6 +11,8 @@ export default defineNuxtConfig({
     '@nuxthq/studio'
   ],
 
+  plugins: ['~/plugins/vue3-cookies.js'],
+
   routeRules: {
     '/': { prerender: true }
   },

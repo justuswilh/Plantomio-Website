@@ -1,7 +1,13 @@
+<script setup>
+import CookieBanner from '~/components/CookieBanner.vue'
+const { $cookies } = useNuxtApp()
+</script>
+
 <template>
   <UApp>
     <NuxtLayout>
-      <NuxtPage content="width=device-width, initial-scale=1.0" />
+      <NuxtPage content="width=device-width" />
+      <CookieBanner />
     </NuxtLayout>
   </UApp>
 </template>
@@ -9,8 +15,6 @@
 <style>
 @import 'tailwindcss';
 @import '@nuxt/ui';
-
-
 
 .bg-secondary {
   background-color: #58ab3a;

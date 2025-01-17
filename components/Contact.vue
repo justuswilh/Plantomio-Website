@@ -168,7 +168,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         </p>
         <p class="text-center mt-8">
           Mit dem Absenden des Formulars erkläre ich mich mit den
-          Datenschutzbestimmungen einverstanden.
+          <NuxtLink to="/datenschutz" class="font-medium hover:underline">Datenschutzbestimmungen</NuxtLink> einverstanden.
         </p>
       </UForm>
     </div>
