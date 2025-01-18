@@ -27,39 +27,46 @@ export default defineEventHandler(async (event) => {
       )
     }
 
-    // 2) E-Mail versenden
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number.parseInt(process.env.SMTP_PORT || '587', 10),
-      secure: process.env.SMTP_PORT === '465',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    })
+    // 2) E-Mail versenden (unabhängig von der DB-Speicherung)
+    let emailSent = false
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number.parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_PORT === '465',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      })
 
-    const mailOptions = {
-      from: '"Plantomio Kontaktformular" <no-reply@plantomio.de>',
-      to: 'justus@plantomio.de',
-      subject: 'Neues Formular Submission',
-      text: `
-        Newsletter: ${newsletter ? 'Ja' : 'Nein'}
-        Beta Programm: ${betaProgram ? 'Ja' : 'Nein'}
-        Name: ${name}
-        Nachname: ${nachname}
-        E-Mail: ${email}
-      `,
-      html: `
-        <h2>Neues Formular Submission</h2>
-        <p><strong>Newsletter:</strong> ${newsletter ? 'Ja' : 'Nein'}</p>
-        <p><strong>Beta Programm:</strong> ${betaProgram ? 'Ja' : 'Nein'}</p>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Nachname:</strong> ${nachname}</p>
-        <p><strong>E-Mail:</strong> ${email}</p>
-      `,
+      const mailOptions = {
+        from: '"Plantomio Kontaktformular" <no-reply@plantomio.de>',
+        to: 'justus@plantomio.de',
+        subject: 'Neues Formular Submission',
+        text: `
+          Newsletter: ${newsletter ? 'Ja' : 'Nein'}
+          Beta Programm: ${betaProgram ? 'Ja' : 'Nein'}
+          Name: ${name}
+          Nachname: ${nachname}
+          E-Mail: ${email}
+        `,
+        html: `
+          <h2>Neues Formular Submission</h2>
+          <p><strong>Newsletter:</strong> ${newsletter ? 'Ja' : 'Nein'}</p>
+          <p><strong>Beta Programm:</strong> ${betaProgram ? 'Ja' : 'Nein'}</p>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Nachname:</strong> ${nachname}</p>
+          <p><strong>E-Mail:</strong> ${email}</p>
+        `,
+      }
+
+      await transporter.sendMail(mailOptions)
+      emailSent = true
+    } catch (emailError) {
+      console.error('Fehler beim Senden der E-Mail:', emailError)
+      // Optional: Du könntest hier eine Benachrichtigung an Admins senden oder andere Maßnahmen ergreifen
     }
-
-    await transporter.sendMail(mailOptions)
 
     // 3) Daten in DB speichern
     await prisma.submission.create({
@@ -72,6 +79,7 @@ export default defineEventHandler(async (event) => {
       },
     })
 
+    // 4) Antwortnachricht erstellen
     let message = 'Vielen Dank für dein Interesse!'
 
     if (newsletter && betaProgram) {
@@ -87,7 +95,7 @@ export default defineEventHandler(async (event) => {
     return { message }
   }
   catch (error) {
-    console.error('Fehler beim Senden oder Speichern:', error)
-    return sendError(event, createError({ statusCode: 500, statusMessage: 'Fehler beim Senden oder Speichern.' }))
+    console.error('Fehler beim Verarbeiten der Anfrage:', error)
+    return sendError(event, createError({ statusCode: 500, statusMessage: 'Fehler beim Verarbeiten der Anfrage.' }))
   }
 })
