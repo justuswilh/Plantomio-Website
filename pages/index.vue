@@ -1,350 +1,1165 @@
+<script setup lang="ts">
+import { gsap } from 'gsap'
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { onMounted, onUnmounted } from 'vue'
+import Contact from '~/components/Contact.vue'
+import ShowcaseCarousel from '~/components/ShowcaseCarousel.vue'
+import { useCookieBannerState } from '~/composables/useCookieBannerState'
+
+// Array zur Speicherung der ScrollTrigger-Instanzen
+const scrollTriggers: ScrollTrigger[] = []
+
+// Variable zur Speicherung der MatchMedia-Instanz
+let mm: ReturnType<typeof ScrollTrigger.matchMedia>
+
+// Variable für Cookie-Banner-Aktivierung
+const { setAnimationCompleted } = useCookieBannerState()
+
+// Event-Handler Referenzen für die Bereinigung
+let onWheelHandler: (e: WheelEvent) => void
+let onTouchMoveHandler: (e: TouchEvent) => void
+let onWheel2Handler: (e: WheelEvent) => void
+let onTouchMove2Handler: (e: TouchEvent) => void
+
+onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
+
+  // Globale Animationen
+  initGlobalAnimations()
+
+  // ScrollTrigger-Breakpoints mit matchMedia
+  mm = ScrollTrigger.matchMedia({
+    '(min-width: 769px)': () => {
+      initDesktopTriggers()
+    },
+    '(max-width: 768px)': () => {
+      initMobileTriggers()
+    },
+  })
+
+  // Idle-Auto-Scroll aktivieren
+  initIdleAutoScroll()
+
+  // Zweiten Idle-Auto-Scroll aktivieren
+  // initIdleAutoScrollToBenefits()
+})
+
+onUnmounted(() => {
+  // Bereinigen aller ScrollTrigger-Instanzen
+  scrollTriggers.forEach(trigger => trigger.kill())
+
+  // Bereinigen der matchMedia-Kontexte
+  if (mm && typeof mm.revert === 'function') {
+    mm.revert()
+  }
+
+  // Entfernen der globalen Event-Listener
+  cleanupEventListeners()
+})
+
+/**
+ *  ----------------------------
+ *  1) ERSTER AUTOSCROLL (wie gehabt)
+ *  ----------------------------
+ */
+function initIdleAutoScroll() {
+  const INACTIVITY_LIMIT = 2000 // z.B. 2s
+  let inactivityTimer: number
+  let autoScrolling = false
+  let autoScrollTween: gsap.core.Tween | null = null
+  let autoScrollAllowed = true
+
+  // Keyframe Trigger, der den ersten Autoscroll deaktiviert
+  const trigger1 = ScrollTrigger.create({
+    trigger: '#showcase-section',
+    start: 'top top',
+    onEnter: () => {
+      disableAutoScroll()
+    },
+  })
+  scrollTriggers.push(trigger1)
+
+  function disableAutoScroll() {
+    autoScrollAllowed = false
+
+    if (autoScrolling && autoScrollTween?.isActive()) {
+      autoScrollTween.kill()
+      autoScrollTween = null
+      autoScrolling = false
+    }
+
+    window.removeEventListener('wheel', onWheelHandler, { passive: true })
+    window.removeEventListener('touchmove', onTouchMoveHandler, { passive: true })
+  }
+
+  function resetTimer() {
+    if (!autoScrollAllowed)
+      return
+
+    clearTimeout(inactivityTimer)
+    inactivityTimer = window.setTimeout(() => {
+      if (!autoScrolling && autoScrollAllowed) {
+        autoScrolling = true
+        autoScrollTween = gsap.to(window, {
+          scrollTo: '#showcase-section',
+          duration: 5,
+          ease: 'sine.inOut',
+          onComplete: () => {
+            autoScrolling = false
+            autoScrollTween = null
+          },
+        })
+      }
+    }, INACTIVITY_LIMIT)
+  }
+
+  onWheelHandler = (e: WheelEvent) => {
+    if (Math.abs(e.deltaY) > 0) {
+      resetTimer()
+      if (autoScrolling && autoScrollTween?.isActive()) {
+        autoScrollTween.kill()
+        autoScrollTween = null
+        autoScrolling = false
+        gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
+      }
+    }
+  }
+
+  onTouchMoveHandler = () => {
+    resetTimer()
+    if (autoScrolling && autoScrollTween?.isActive()) {
+      autoScrollTween.kill()
+      autoScrollTween = null
+      autoScrolling = false
+      gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
+    }
+  }
+
+  window.addEventListener('wheel', onWheelHandler, { passive: true })
+  window.addEventListener('touchmove', onTouchMoveHandler, { passive: true })
+
+  // Timer beim Start aktivieren
+  resetTimer()
+}
+
+/**
+ *  2) ZWEITER AUTOSCROLL -> Scrollt langsam bis #showcaseCarousel
+ *     Aktivierung erst, wenn bestimmter Keyframe erreicht.
+ *     Deaktivierung, wenn der Keyframe wieder verlassen wird.
+ */
+// function initIdleAutoScrollToBenefits() {
+//   const INACTIVITY_LIMIT_2 = 10000
+//   let inactivityTimer2: number
+//   let autoScrolling2 = false
+//   let autoScrollTween2: gsap.core.Tween | null = null
+//   let autoScrollAllowed2 = false // Zu Beginn nicht erlaubt
+
+//   // ScrollTrigger, der den 2. Autoscroll "freigibt"
+//   const trigger2 = ScrollTrigger.create({
+//     trigger: '#showcase-section',
+//     start: 'top+=-10 top',
+//     onEnter: () => {
+//       autoScrollAllowed2 = true
+//       resetTimer2()
+//     },
+//     onLeaveBack: () => {
+//       autoScrollAllowed2 = false
+//       if (autoScrolling2 && autoScrollTween2?.isActive()) {
+//         autoScrollTween2.kill()
+//         autoScrollTween2 = null
+//         autoScrolling2 = false
+//       }
+//     },
+//   })
+//   scrollTriggers.push(trigger2)
+
+//   // ScrollTrigger, der den 2. Autoscroll deaktiviert
+//   const trigger3 = ScrollTrigger.create({
+//     trigger: '#showcaseCarousel',
+//     start: 'top top',
+//     onEnter: () => {
+//       disableAutoScroll2()
+//     },
+//     onEnterBack: () => {
+//       disableAutoScroll2()
+//     },
+//   })
+//   scrollTriggers.push(trigger3)
+
+//   // Deaktivierung des zweiten Autoscrolls
+//   function disableAutoScroll2() {
+//     autoScrollAllowed2 = false
+
+//     // Falls gerade ein Tween läuft, abbrechen
+//     if (autoScrolling2 && autoScrollTween2?.isActive()) {
+//       autoScrollTween2.kill()
+//       autoScrollTween2 = null
+//       autoScrolling2 = false
+//     }
+
+//     // Event-Listener entfernen
+//     window.removeEventListener('wheel', onWheel2Handler, { passive: true })
+//     window.removeEventListener('touchmove', onTouchMove2Handler, { passive: true })
+//   }
+
+//   // Timer zurücksetzen
+//   function resetTimer2() {
+//     if (!autoScrollAllowed2)
+//       return
+
+//     clearTimeout(inactivityTimer2)
+//     inactivityTimer2 = window.setTimeout(() => {
+//       if (!autoScrolling2 && autoScrollAllowed2) {
+//         autoScrolling2 = true
+//         autoScrollTween2 = gsap.to(window, {
+//           scrollTo: '#showcaseCarousel',
+//           duration: 40,
+//           ease: 'power0.in',
+//           onComplete: () => {
+//             autoScrolling2 = false
+//             autoScrollTween2 = null
+//           },
+//         })
+//       }
+//     }, INACTIVITY_LIMIT_2)
+//   }
+
+//   onWheel2Handler = (e: WheelEvent) => {
+//     if (Math.abs(e.deltaY) > 0) {
+//       resetTimer2()
+//       interruptAutoScroll2()
+//     }
+//   }
+
+//   onTouchMove2Handler = () => {
+//     resetTimer2()
+//     interruptAutoScroll2()
+//   }
+
+//   function interruptAutoScroll2() {
+//     if (autoScrolling2 && autoScrollTween2?.isActive()) {
+//       autoScrollTween2.kill()
+//       autoScrollTween2 = null
+//       autoScrolling2 = false
+//       gsap.to(window, { scrollTo: window.scrollY, duration: 0.1 })
+//     }
+//   }
+
+//   window.addEventListener('wheel', onWheel2Handler, { passive: true })
+//   window.addEventListener('touchmove', onTouchMove2Handler, { passive: true })
+// }
+
+function initGlobalAnimations() {
+  // Overlay Animation
+  gsap.set('#black-overlay', { autoAlpha: 1 })
+  gsap.to('#black-overlay', {
+    autoAlpha: 0,
+    duration: 1.2,
+    delay: 0.2,
+  })
+
+  gsap.fromTo(
+    '#hero-image',
+    { y: '20%', autoAlpha: 0 },
+    { y: '0%', autoAlpha: 1, duration: 1.2, delay: 0.2 },
+  )
+}
+
+function initMobileTriggers() {
+  // ScrollTrigger für #effekt-word1
+  const trigger1 = ScrollTrigger.create({
+    trigger: '#word-section1',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#pinned-heading', { autoAlpha: 0 })
+      gsap.set('#effekt-word1', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#pinned-heading', { autoAlpha: 0 })
+      gsap.set('#effekt-word1', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger1)
+
+  // ScrollTrigger für #effekt-word2
+  const trigger2 = ScrollTrigger.create({
+      trigger: '#word-section2',
+      start: 'top+=50 center',
+      end: 'bottom+=50 center',
+      pin: true,
+      onEnter: () => {
+        gsap.set('#effekt-word1', { autoAlpha: 0 })
+        gsap.set('#effekt-word2', { autoAlpha: 1 })
+      },
+      onEnterBack: () => {
+        gsap.set('#effekt-word1', { autoAlpha: 0 })
+        gsap.set('#effekt-word2', { autoAlpha: 1 })
+      },
+      onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
+    })
+    scrollTriggers.push(trigger2)
+
+  // ScrollTrigger für #effekt-word3
+  const trigger3 = ScrollTrigger.create({
+    trigger: '#word-section3',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#effekt-word2', { autoAlpha: 0 })
+      gsap.set('#effekt-word3', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#effekt-word2', { autoAlpha: 0 })
+      gsap.set('#effekt-word3', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger3)
+}
+
+function initDesktopTriggers() {
+  // Animation für #pinned-heading
+  const timeline1 = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#pinned-heading-section',
+      start: 'top-=35 center',
+      end: 'bottom+=50 center',
+      pin: true,
+      scrub: true,
+      onEnterBack: () => {
+        gsap.set('#pinned-heading', { autoAlpha: 1 })
+      },
+    },
+  })
+  timeline1.fromTo(
+    '#pinned-heading',
+    { scale: 1 },
+    { scale: 1.2, duration: 0.2 },
+  )
+  scrollTriggers.push(timeline1.scrollTrigger)
+
+  // ScrollTrigger für #effekt-word1
+  const trigger1 = ScrollTrigger.create({
+    trigger: '#word-section1',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#pinned-heading', { autoAlpha: 0 })
+      gsap.set('#effekt-word1', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#pinned-heading', { autoAlpha: 0 })
+      gsap.set('#effekt-word1', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word1', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger1)
+
+  // ScrollTrigger für #effekt-word2
+  const trigger2 = ScrollTrigger.create({
+    trigger: '#word-section2',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#effekt-word1', { autoAlpha: 0 })
+      gsap.set('#effekt-word2', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#effekt-word1', { autoAlpha: 0 })
+      gsap.set('#effekt-word2', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger2)
+
+  // ScrollTrigger für #effekt-word3
+  const trigger3 = ScrollTrigger.create({
+    trigger: '#word-section3',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#effekt-word2', { autoAlpha: 0 })
+      gsap.set('#effekt-word3', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#effekt-word2', { autoAlpha: 0 })
+      gsap.set('#effekt-word3', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word3', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger3)
+
+  // Ausklappen von #showcase-info1
+  const trigger4 = ScrollTrigger.create({
+    trigger: '#showcase-section',
+    start: 'top+=200 center',
+    end: 'bottom+=50 center',
+    scrub: true,
+    onEnter: () => {
+      gsap.to('#showcase-info1', {
+        x: 0,
+        duration: 1,
+        ease: 'power2.out',
+      })
+    },
+    onLeaveBack: () => {
+      gsap.to('#showcase-info1', {
+        x: -800,
+        duration: 1,
+        ease: 'power2.in',
+      })
+    },
+  })
+  scrollTriggers.push(trigger4)
+
+  // #effekt-word3 schneller bewegen
+  const timeline2 = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#showcase-section',
+      start: 'top+=300 center',
+      end: 'top+=600 center',
+      scrub: true,
+    },
+  })
+  timeline2.fromTo(
+    '#effekt-word3',
+    { y: 0 },
+    { y: -200, duration: 5 },
+  )
+  scrollTriggers.push(timeline2.scrollTrigger)
+
+  // Showcase-Content 1 pinnen
+  const trigger5 = ScrollTrigger.create({
+    trigger: '#showcase-section',
+    start: 'top top',
+    end: 'bottom top',
+    pin: '#showcase-content1',
+    pinSpacing: false,
+    scrub: true,
+    onEnter: () => {
+      setAnimationCompleted()
+    },
+  })
+  scrollTriggers.push(trigger5)
+
+  // Showcase-Content 2 pinnen und einblenden
+  const trigger6 = ScrollTrigger.create({
+    trigger: '#showcase-content2',
+    start: 'top top',
+    pin: '#showcase-content2',
+    pinSpacing: false,
+    onEnter: () => {
+      gsap.to('#showcase-info2', {
+        x: 0,
+        duration: 1,
+        ease: 'power2.out',
+      })
+      gsap.to('#step2', {
+        autoAlpha: 1,
+        duration: 1,
+        ease: 'power2.out',
+      })
+    },
+    onLeaveBack: () => {
+      gsap.to('#showcase-info2', {
+        x: -800,
+        duration: 0.6,
+        ease: 'power2.in',
+      })
+      gsap.to('#step2', {
+        autoAlpha: 0,
+        duration: 0.6,
+        ease: 'power2.in',
+      })
+    },
+  })
+  scrollTriggers.push(trigger6)
+
+  // Showcase-Content 3 pinnen und einblenden
+  const trigger7 = ScrollTrigger.create({
+    trigger: '#showcase-content3',
+    start: 'top top',
+    end: 'bottom top',
+    pin: true,
+    pinSpacing: false,
+    onEnter: () => {
+      gsap.to('#showcase-info3', {
+        x: 0,
+        duration: 1,
+        ease: 'power2.out',
+      })
+      gsap.to('#step3', {
+        autoAlpha: 1,
+        duration: 1,
+        ease: 'power2.out',
+      })
+    },
+    onLeaveBack: () => {
+      gsap.to('#showcase-info3', {
+        x: -800,
+        duration: 0.6,
+        ease: 'power2.in',
+      })
+      gsap.to('#step3', {
+        autoAlpha: 0,
+        duration: 0.6,
+        ease: 'power2.in',
+      })
+    },
+  })
+  scrollTriggers.push(trigger7)
+}
+
+/**
+ * Funktion zum Entfernen der globalen Event-Listener
+ */
+function cleanupEventListeners() {
+  if (onWheelHandler) {
+    window.removeEventListener('wheel', onWheelHandler, { passive: true })
+  }
+  if (onTouchMoveHandler) {
+    window.removeEventListener('touchmove', onTouchMoveHandler, { passive: true })
+  }
+  if (onWheel2Handler) {
+    window.removeEventListener('wheel', onWheel2Handler, { passive: true })
+  }
+  if (onTouchMove2Handler) {
+    window.removeEventListener('touchmove', onTouchMove2Handler, { passive: true })
+  }
+}
+</script>
+
 <template>
-  <div class="relative flex flex-col items-center justify-center min-h-screen">
-    <!-- Initiales Overlay mit Fade-Out Transition -->
-    <transition name="fade">
-      <div
-        v-if="showOverlay"
-        class="fixed inset-0 bg-black z-40"
-      ></div>
-    </transition>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  </head>
+  <div class="scroll-container">
+    <!-- 1) Schwarzes Overlay (fixed) -->
+    <div id="black-overlay" class="black-overlay" />
 
-    <!-- Scroll Overlay -->
-    <div
-      v-if="showScrollOverlay"
-      class="fixed inset-0 bg-white z-30"
-    ></div>
-
-    <!-- Zentrales Textelement -->
-    <div
-      v-if="currentCentralText"
-      class="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
+    <!-- 2) Image-Abschnitt (normal im Flow) -->
+    <section
+      id="image-section"
+      class="hero-section"
     >
-      <h1 class="text-black text-4xl sm:text-5xl lg:text-8xl font-bold">
-        {{ currentCentralText }}
+      <div class="hero-image-container">
+        <img
+          id="hero-image"
+          src="/Logo.svg"
+          alt="Hero"
+          class="hero-image"
+        >
+      </div>
+    </section>
+
+    <!-- 3) Erste Überschrift (pinned + skaliert) -->
+    <section
+      id="pinned-heading-section"
+      class="pinned-heading-section mobil-invisible"
+    >
+      <h1 id="pinned-heading" class="pinned-heading">
+        Automatische Versorgung für deine Pflanzen!<br>
+        Aber wie?
       </h1>
-    </div>
+    </section>
 
-    <!-- Hauptinhalt der Seite mit Slide-In Animation -->
-    <div
-      :class="['main-content', { 'visible': !showOverlay }, 'flex flex-col items-center justify-center min-h-screen']"
+    <!-- 4) Wort-Abschnitt (pinned) -->
+    <section
+      id="word-section"
+      class="word-section text-black z-50"
     >
-      <div v-if="data" class="w-full">
-        <!-- Picture -->
-        <section 
-          v-if="picture.length" 
-          ref="pictureSection" 
-          :style="{ transform: pictureTransform }" 
-          class="flex items-center h-screen w-full relative overflow-hidden"
-        >
-          <ASTRenderer 
-            :nodes="picture" 
-            class="w-content max-w-md sm:max-w-lg lg:max-w-xl mx-auto items-center object-cover sm:object-contain text-base sm:text-lg lg:text-xl" 
-          />
-        </section>
+      <div id="word-section1" class="word-section">
+        <div id="effekt-word1" class="effekt-word">
+          Smarthome
+        </div>
+      </div>
+      <div id="word-section2" class="word-section">
+        <div id="effekt-word2" class="effekt-word">
+          Trifft
+        </div>
+      </div>
+      <div id="word-section3" class="word-section">
+        <div id="effekt-word3" class="effekt-word">
+          Botanik
+        </div>
+      </div>
+    </section>
+    <div spacer class="spacer" />
 
-        <!-- Effekt 1 -->
-        <section 
-          class="flex flex-col justify-center w-full"
-        >
-          <div 
-            class="text-center content-center items-center text-2xl sm:text-3xl lg:text-4xl font-bold relative"
-          >
-            Automatische Versorgung für deine Pflanzen!<br />Aber wie?
+    <!-- 5) Showcase-Section -->
+    <section id="showcase-section" class="showcase-section">
+      <div id="showcase-content1" class="showcase-content">
+        <!-- Linker Bereich (1/3) -->
+        <div id="showcase-info1" class="showcase-info bg-secondary">
+          <div id="showcase-info-text1" class="showcase-info-text">
+            <p class="text-large pb-6 text-white font-semibold">
+              Zielgenaue<br>Bewässerung
+            </p>
+            <img src="/plantmonitor+plug.png" alt="Showcase Image" class="device-image">
+            <div class="flex flex-col">
+              <p class="text-base text-white pb-4 font-semibold">
+                Reduziert Sorgen und Wasserbedarf
+              </p>
+              <p class="text-base text-white font-normal whitespace-normal">
+                Dank Monitoring und intelligenter Steuerung schließt du nicht nur Unterversorgung aus, sondern profitierst auch vom Wasser-Sparpotential einer bedarfsgerechten Tröpfchenbewässerung.
+              </p>
+            </div>
           </div>
-          <div 
-            class="text-center -mt-14 invisible content-center items-center relative"
-            ref="smarthomeSection"
-          >
-            SMARTHOME
+        </div>
+        <!-- Rechter Bereich (2/3) -->
+        <div class="image-container">
+          <img src="/showcase/1.png" alt="Showcase Image" class="showcase-image">
+          <img id="step2" src="/showcase/2.png" alt="Showcase Image" class="showcase-image-hidden mobil-invisible">
+          <img id="step3" src="/showcase/3.png" alt="Showcase Image" class="showcase-image-hidden mobil-invisible">
+          <div class="flex w-full gap-3 flex-col mb-4 z-50 mobil-invisible mt-auto">
+            <div class="flex w-full text-lg font-semibold flex-col">
+              <p class="font-normal uppercase py-1 tracking-widest px-10">
+                Monitoring
+              </p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
+                <div class="flex flex-col w-1/3">
+                  <p class="">
+                    Feuchtigkeit im Pflanzsubstrat
+                  </p>
+                </div>
+                <div id="step2" class="flex flex-col invisible w-1/3">
+                  <p>Füllstand, Wassertemperatur, EC-Wert, Ph-Wert</p>
+                </div>
+                <div id="step3" class="flex flex-col invisible w-1/3">
+                  <p>Temperatur, Luftfeuchtigkeit, Optisch, VPD (Dampfdruckdefizit)</p>
+                </div>
+              </div>
+            </div>
+            <div class="flexd text-lg w-full font-semibold flex-col">
+              <p class="font-normal tracking-widest py-1 uppercase px-10">
+                Automatisierung
+              </p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 bg-lightblue text-white">
+                <div class="flex flex-col w-1/3">
+                  <p class="">
+                    Bewässerung
+                  </p>
+                </div>
+                <div id="step2" class="flex flex-col w-1/3 invisible">
+                  <p>Nährstoffversorgung, Ph-Management, Wasserbezug</p>
+                </div>
+                <div id="step3" class="flex flex-col w-1/3 invisible">
+                  <p>Klimamanagement</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div 
-            class="text-center mt-40 content-center invisible relative"
-            ref="trifftSection"
-          >
-            TRIFFT
-          </div>
-          <div 
-            class="text-center mt-40 content-center invisible relative"
-            ref="botanikMarkerSection"
-          >
-            BOTANIK_MARKER
-          </div>
-          <div 
-            class="text-center mt-40 content-center text-4xl sm:text-5xl lg:text-8xl font-bold relative"
-            ref="botanikSection"
-          >
-            BOTANIK
-          </div>
-        </section>
-
-        <!-- Hauptinhalt -->
-        <section v-if="hauptinhalt.length" class="flex h-screen flex-col items-center justify-center mt-8 sm:mt-12 lg:mt-16">
-          <ASTRenderer 
-            :nodes="hauptinhalt" 
-            class="w-full max-w-2xl mx-auto sm:mx-0 text-center font-semibold text-2xl sm:text-3xl lg:text-4xl" 
-          />
-        </section>
+        </div>
       </div>
 
-      <!-- Ladezustand und Fehler anzeigen -->
-      <div v-if="pending" class="text-center mt-6 sm:mt-8 text-lg sm:text-xl">Lade...</div>
-      <div v-if="error" class="text-center mt-4 text-red-500 text-base sm:text-lg">
-        Fehler: {{ error.message }}
+      <!-- Content2 -->
+      <div id="showcase-content2" class="showcase-content">
+        <!-- Linker Bereich (1/3) -->
+        <div id="showcase-info2" class="showcase-info bg-secondary">
+          <div id="showcase-info-text2" class="showcase-info-text">
+            <p class="text-large pb-6 text-white font-semibold">
+              Nährstoffversorgung<br>ohne Kompromisse
+            </p>
+            <div class="flex flex-col">
+              <p class="text-base text-white pb-4 font-semibold">
+                Tankmonitor
+              </p>
+              <p class="text-base text-white font-normal whitespace-normal">
+                Um sichere Automatisierung zu gewährleisten, wird der Nährstofftank zu jeder Zeit durch Radar und Messsonden überwacht.
+              </p>
+            </div>
+            <div class="flex flex-col">
+              <p class="text-base text-white pb-4 font-semibold">
+                Nährstoffcontroller
+              </p>
+              <p class="text-base text-white font-normal whitespace-normal">
+                Drei Komponenten eines Düngemittelsystems und Zwei Ph-Korrerkturlösungen werden bei Bedarf automatisch infundiert.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- Mobilversion Image -->
+        <div class="image-container-invisible">
+          <img src="/showcase/2.png" alt="Showcase Image" class="showcase-image">
+        </div>
       </div>
-    </div>
+
+      <!-- Content3 -->
+      <div id="showcase-content3" class="showcase-content">
+        <!-- Linker Bereich (1/3) -->
+        <div id="showcase-info3" class="showcase-info bg-secondary">
+          <div id="showcase-info-text3" class="showcase-info-text">
+            <p class="text-large pb-6 text-white font-semibold">
+              Volle Kontrolle?<br>Kein Problem!
+            </p>
+            <img src="/climatemonitor+plug.png" alt="Showcase Image" class="device-image max-w-sm">
+            <div class="flex flex-col">
+              <p class="text-base text-white pb-4 font-semibold">
+                Ganzjährig bestes Klima
+              </p>
+              <p class="text-base text-white font-normal whitespace-normal">
+                Ob Indoor oder im isolierten Gewächshaus, unser System übernimmt die Regulierung des Klimas, abgestimmt auf deine Pflanzen. Unsere SmartPlugs ermöglichen das Einbinden analoger Geräte. Außerdem können smarte Geräte wie Thermostate oder Abluftventilatoren eingebunden werden.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- Mobilversion Image und Beschreibung -->
+        <div class="image-container-invisible">
+          <img src="/showcase/3.png" alt="Showcase Image" class="showcase-image mobil-padding">
+          <div class="flex w-full gap-3 flex-col mb-4 z-50 mt-auto">
+            <div class="flex w-full text-lg font-semibold flex-col">
+              <p class="font-normal uppercase py-1 tracking-widest text-2xl px-10">
+                Monitoring
+              </p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 text-lg bg-lightblue text-white">
+                <div class="flex flex-col">
+                  <p>Substratfeuchtigkeit</p>
+                  <p>Füllstand</p>
+                  <p>Wassertemperatur</p>
+                  <p>EC-Wert</p>
+                  <p>PH-Wert</p>
+                  <p>Temperatur</p>
+                  <p>Luftfeuchtigkeit</p>
+                  <p>VPD</p>
+                  <p>Optisch</p>
+                </div>
+              </div>
+            </div>
+            <div class="flexd text-lg w-full font-semibold flex-col">
+              <p class="font-normal tracking-widest py-1 uppercase text-2xl px-10">
+                Automatisierung
+              </p>
+              <div class="flex flex-row font-medium gap-4 py-2 px-10 text-xl bg-lightblue text-white">
+                <div class="flex flex-col w-1/3">
+                  <p>Bewässerung</p>
+                  <p>Nährstoffversorgung</p>
+                  <p>Ph-Management</p>
+                  <p>Wasserbezug</p>
+                  <p>Klimamanagement</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <ShowcaseCarousel />
+    </section>
+
+    <section id="benefits" class="flex flex-col text-primary min-h-screen">
+      <div class="flex flex-col bg-secondary text-white">
+        <p class="text-large font-semibold mt-6 mb-8 text-center justify-top">
+          Vorteile auf einen Blick
+        </p>
+      </div>
+      <div class="benefits-grid">
+        <div class="flex flex-col">
+          <div class="benefit">
+            <img src="/benefit/1.svg" alt="Benefit 1 Image" class="">
+          </div>
+          <p class="md:text-2xl mt-4 font-bold">
+            Hybrides Monitoring
+          </p>
+          <p class="md:text-xl mt-1 font-medium">
+            Messung und Auswertung aller relevanten Einflussfaktoren
+          </p>
+        </div>
+        <div class="flex flex-col">
+          <div class="benefit">
+            <img src="/benefit/2.svg" alt="Benefit 2 Image" class="">
+          </div>
+          <p class="md:text-2xl mt-4 font-bold">
+            Automatische Versorgung
+          </p>
+          <p class="md:text-xl mt-1 font-medium">
+            Kabellose, modulare Plug and Play Automatisierung
+          </p>
+        </div>
+        <div class="flex flex-col">
+          <div class="benefit">
+            <img src="/benefit/3.svg" alt="Benefit 3 Image" class="">
+          </div>
+          <p class="md:text-2xl mt-4 font-bold">
+            Intelligente Gartenassistenz
+          </p>
+          <p class="md:text-xl mt-1 font-medium">
+            Interaktiv angeleitet, ohne Vorwissen, erfolgreich kultivieren
+          </p>
+        </div>
+        <div class="flex flex-col">
+          <div class="benefit">
+            <img src="/benefit/4.svg" alt="Benefit 4 Image" class="">
+          </div>
+          <p class="md:text-2xl mt-4 font-bold">
+            Smarthome Prinzip
+          </p>
+          <p class="md:text-xl mt-1 font-medium">
+            Kabellos, flexibel, unkompliziert, erweiterbar, günstig
+          </p>
+        </div>
+        <div class="flex flex-col">
+          <div class="benefit">
+            <img src="/benefit/5.svg" alt="Benefit 5 Image" class="">
+          </div>
+          <p class="md:text-2xl mt-4 font-bold">
+            Zeitersparnis
+          </p>
+          <p class="md:text-xl mt-1 font-medium">
+            Weniger Zeit und Mühe, dafür mehr Zeit zum genießen
+          </p>
+        </div>
+        <div class="flex flex-col">
+          <div class="benefit">
+            <img src="/benefit/6.svg" alt="Benefit 6 Image" class="">
+          </div>
+          <p class="md:text-2xl mt-4 font-bold">
+            Mehr Ertrag
+          </p>
+          <p class="md:text-xl mt-1 font-medium">
+            Egal was du ernten willst, wir machen einfach mehr daraus
+          </p>
+        </div>
+        <div class="flex flex-col">
+          <div class="benefit">
+            <img src="/benefit/7.svg" alt="Benefit 7 Image" class="">
+          </div>
+          <p class="md:text-2xl mt-4 font-bold">
+            Versorgung in Abwesenheit
+          </p>
+          <p class="md:text-xl mt-1 font-medium">
+            Erfolgreich im Garten, trotz flexiblen Lebensstil
+          </p>
+        </div>
+        <div class="flex flex-col">
+          <div class="benefit">
+            <img src="/benefit/8.svg" alt="Benefit 8 Image" class="">
+          </div>
+          <p class="md:text-2xl mt-4 font-bold">
+            Keine Sorgen mehr
+          </p>
+          <p class="md:text-xl mt-1 font-medium">
+            Nichts im Leben ist sicher aber deine Pflanzen sind nah dran
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <Contact />
+
+    <footer class="flex flex-col md:text-lg text-gray-300 bg-footer md:mt-12 pt-6">
+      <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-20 mb-4">
+        <div class="flex grow" />
+        <div class="flex flex-col grow items-center">
+          <div class="flex flex-col items-start w-60">
+            <span class="mb-2 uppercase text-sm">Rechtliches</span>
+            <NuxtLink href="/impressum" class="mb-2 hover:underline">
+              Impressum
+            </NuxtLink>
+            <NuxtLink href="/datenschutz" class="hover:underline">
+              Datenschutz
+            </NuxtLink>
+          </div>
+        </div>
+        <div class="flex flex-col grow items-center">
+          <div class="flex flex-col items-start w-60">
+            <span class="mb-2 uppercase text-sm">Kontakt</span>
+            <a href="mailto:team@plantomio.de" class="mb-2 hover:underline">team@plantomio.de</a>
+            <a class="">+49 157 87351403</a>
+          </div>
+        </div>
+        <div class="flex grow" />
+      </div>
+      <!-- Copyright -->
+      <p class="text-center">
+        &copy; 2025 Plantomio UG
+      </p>
+    </footer>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import ASTRenderer from '~/components/ASTRenderer.vue' // Pfad anpassen
-import { useAsyncData } from 'nuxt/app' // Beispiel-Import, anpassen je nach Setup
-
-// Asynchrone Daten laden
-const { data, pending, error } = await useAsyncData('content', () => queryContent('home').findOne())
-
-// Funktion zum Extrahieren einer Sektion basierend auf der Überschrift
-function extractSection(body, sectionTitle) {
-  if (!body || !body.children) return []
-
-  const sections = {}
-  let currentSection = null
-
-  body.children.forEach(node => {
-    if (node.type === 'element' && node.tag === 'h2') {
-      const title = node.children[0].value
-      currentSection = title
-      sections[currentSection] = []
-    } else if (currentSection) {
-      sections[currentSection].push(node)
-    }
-  })
-
-  return sections[sectionTitle] || []
-}
-
-// Computed Properties für jede Sektion
-const hauptinhalt = computed(() => extractSection(data.value?.body, 'Hauptinhalt'))
-const picture = computed(() => extractSection(data.value?.body, 'Picture'))
-
-// Overlay States
-const showOverlay = ref(true) // Initial auf true setzen, um das Overlay anzuzeigen
-const showScrollOverlay = ref(false) // Zustand für Scroll-Overlay
-
-// Central Text State
-const currentCentralText = ref(null) // Neuer Zustand für zentralen Text
-
-// Refs für die beobachteten Abschnitte
-const smarthomeSection = ref(null)
-const trifftSection = ref(null)
-const botanikMarkerSection = ref(null)
-const botanikSection = ref(null)
-const pictureSection = ref(null) // Hinzugefügt
-
-// Transformation für das Bild
-const pictureTransform = ref('translateY(0px)') // Hinzugefügt
-
-// Flags, um Mehrfach-Logs zu verhindern
-const smarthomeLogged = ref(false)
-const trifftLogged = ref(false)
-const botanikMarkerLogged = ref(false)
-const botanikLogged = ref(false)
-
-// Flag to check if user has scrolled
-const hasScrolled = ref(false)
-
-// Funktion zum Überprüfen der Position der Elemente
-function checkPositions() {
-  if (!hasScrolled.value) {
-    // Do not update overlays or central text if user hasn't scrolled
-    return
-  }
-
-  const viewportCenter = window.scrollY + window.innerHeight / 2
-
-  // Berechnung der Positionen der Mittelpunkte der Sektionen
-  let smarthomeCenter = 0
-  let trifftCenter = 0
-  let botanikMarkerCenter = 0
-  let botanikCenter = 0
-
-  if (smarthomeSection.value) {
-    const rect = smarthomeSection.value.getBoundingClientRect()
-    smarthomeCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  if (trifftSection.value) {
-    const rect = trifftSection.value.getBoundingClientRect()
-    trifftCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  if (botanikMarkerSection.value) {
-    const rect = botanikMarkerSection.value.getBoundingClientRect()
-    botanikMarkerCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  if (botanikSection.value) {
-    const rect = botanikSection.value.getBoundingClientRect()
-    botanikCenter = window.scrollY + rect.top + rect.height / 2
-  }
-
-  // Logik zur Anzeige des Scroll-Overlays bis Botanik erreicht ist
-  if (viewportCenter > smarthomeCenter && viewportCenter < botanikCenter) {
-    if (!showScrollOverlay.value) {
-      console.log('Scroll Overlay wird angezeigt.')
-      showScrollOverlay.value = true
-    }
-  } else {
-    if (showScrollOverlay.value) {
-      console.log('Scroll Overlay wird ausgeblendet.')
-      showScrollOverlay.value = false
-    }
-  }
-
-  // Logik zum Setzen des zentralen Texts
-  if (viewportCenter >= smarthomeCenter && viewportCenter < trifftCenter) {
-    if (currentCentralText.value !== 'SMARTHOME') {
-      console.log('Zentraler Text: SMARTHOME')
-      currentCentralText.value = 'SMARTHOME'
-    }
-  } else if (viewportCenter >= trifftCenter && viewportCenter < botanikMarkerCenter) {
-    if (currentCentralText.value !== 'TRIFFT') {
-      console.log('Zentraler Text: TRIFFT')
-      currentCentralText.value = 'TRIFFT'
-    }
-  } else if (viewportCenter >= botanikMarkerCenter && viewportCenter < botanikCenter) {
-    if (currentCentralText.value !== 'BOTANIK') {
-      console.log('Zentraler Text: BOTANIK')
-      currentCentralText.value = 'BOTANIK'
-    }
-  } else {
-    // Außerhalb der definierten Bereiche den zentralen Text entfernen
-    if (currentCentralText.value !== null) {
-      console.log('Zentraler Text entfernt.')
-      currentCentralText.value = null
-    }
-  }
-
-  // Logik zum Loggen, wenn SMARTHOME in der Mitte ist
-  if (!smarthomeLogged.value && Math.abs(viewportCenter - smarthomeCenter) <= 10) {
-    console.log('SMARTHOME ist jetzt in der Bildschirmmitte.')
-    smarthomeLogged.value = true
-  } else if (smarthomeLogged.value && viewportCenter < smarthomeCenter - 10) {
-    smarthomeLogged.value = false
-  }
-
-  // Logik zum Loggen, wenn TRIFFT in der Mitte ist
-  if (!trifftLogged.value && Math.abs(viewportCenter - trifftCenter) <= 10) {
-    console.log('TRIFFT ist jetzt in der Bildschirmmitte.')
-    trifftLogged.value = true
-  } else if (trifftLogged.value && viewportCenter < trifftCenter - 10) {
-    trifftLogged.value = false
-  }
-
-  // Logik zum Loggen, wenn BOTANIK_MARKER in der Mitte ist
-  if (!botanikMarkerLogged.value && Math.abs(viewportCenter - botanikMarkerCenter) <= 10) {
-    console.log('BOTANIK_MARKER ist jetzt in der Bildschirmmitte.')
-    botanikMarkerLogged.value = true
-  } else if (botanikMarkerLogged.value && viewportCenter < botanikMarkerCenter - 10) {
-    botanikMarkerLogged.value = false
-  }
-
-  // Logik zum Loggen, wenn BOTANIK in der Mitte ist
-  if (!botanikLogged.value && Math.abs(viewportCenter - botanikCenter) <= 10) {
-    console.log('BOTANIK ist jetzt in der Bildschirmmitte.')
-    botanikLogged.value = true
-
-    // Overlay und zentralen Text ausblenden
-    if (showScrollOverlay.value) {
-      showScrollOverlay.value = false
-      console.log('Scroll Overlay wird ausgeblendet.')
-    }
-
-    if (currentCentralText.value !== null) {
-      currentCentralText.value = null
-      console.log('Zentraler Text entfernt.')
-    }
-  } else if (botanikLogged.value && viewportCenter > botanikCenter + 10) {
-    botanikLogged.value = false
-  }
-
-  // Transformation für das Bild anwenden
-  if (pictureSection.value) {
-    const scrollY = window.scrollY
-    const transformValue = `translateY(-${scrollY * 1}px)`
-    pictureTransform.value = transformValue
-  }
-}
-
-// Throttling mit requestAnimationFrame
-let ticking = false
-function onScroll() {
-  if (!hasScrolled.value) {
-    hasScrolled.value = true
-  }
-  if (!ticking) {
-    window.requestAnimationFrame(() => {
-      checkPositions()
-      ticking = false
-    })
-    ticking = true
-  }
-}
-
-onMounted(async () => {
-  await nextTick() // Sicherstellen, dass DOM gerendert ist
-
-  // Start des Fade-Out nach kurzer Verzögerung (z.B. 100ms)
-  setTimeout(() => {
-    showOverlay.value = false
-  }, 100) // 100 Millisekunden Verzögerung, um den Transition-Start zu gewährleisten
-
-  // Scroll-Listener hinzufügen
-  window.addEventListener('scroll', onScroll)
-  window.addEventListener('resize', onScroll) // Optional: Überprüfen bei Größenänderung
-})
-
-onBeforeUnmount(() => {
-  // Scroll-Listener entfernen
-  window.removeEventListener('scroll', onScroll)
-  window.removeEventListener('resize', onScroll)
-})
-</script>
-
 <style scoped>
-/* Fade-Out Transition für das Overlay */
-.fade-leave-active {
-  transition: opacity 1.2s ease;
+  /* Container-Stile */
+  .scroll-container {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Schwarzes Overlay (fixed, kein Platz im Dokumentenfluss) */
+  #black-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+  }
+
+  .hero-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 30%;
+  }
+
+  .hero-image {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  height: auto;
+  }
+
+  /* Überschrift (pinned) */
+  .pinned-heading-section {
+    position: relative; /* Notwendig für Pinning */
+    display: flex;
+    height: 60vh;
+    align-items: top;
+    justify-content: center;
+  }
+
+  .pinned-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    transform-origin: center center; /* Für zentrierte Skalierung */
+    will-change: transform, opacity;  /* Optimierung für Animationen */
+  }
+
+  /* Wort-Abschnitt (pinned) */
+  .word-section {
+    position: relative; /* Notwendig für Pinning */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .effekt-word {
+    font-size: 5rem;
+    font-weight: 500 ;
+    margin-bottom: 60vh;
+    transform-origin: center center;
+    will-change: transform, opacity;  /* Optimierung für Animationen */
+    opacity: 0; /* Initial versteckt */
+    text-transform: uppercase;
+  }
+
+  /* Showcase-Section */
+.showcase-section {
+  display: flex;
+  flex-direction: column;
+  align-items: top;
+  justify-content: center; /* Vollständige Anzeigehöhe */
+  box-sizing: border-box;
+  margin: 0 0 100vh 0;
 }
-.fade-leave-to {
+
+.showcase-content {
+  display: flex;
+  width: 100%;
+}
+
+/* Linker Bereich (1/3) */
+.showcase-info {
+  flex: 1; /* 1/3 */
+  position: relative;
+  width: 30%;
+  height: 100vh;
+  border-radius: 0px 15px 15px 0px; /* Runde Ecken */
+  transform: translateX(-800px); /* Initiale Position für Animation */
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.showcase-info-text {
+  text-align: left;
+  padding-left: 10%;
+  padding-right: 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  min-height: 100%;
+}
+
+/* Rechter Bereich (2/3) */
+.image-container {
+  flex: 2; /* 2/3 */
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: top;
+  flex-grow: q;
+  height: 100vh;
+}
+
+.image-container-invisible {
+  flex: 2; /* 2/3 */
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: top;
+  flex-grow: q;
+  height: 100vh;
   opacity: 0;
 }
 
-/* Optional: Fade-In Transition (falls benötigt) */
-.fade-enter-active {
-  transition: opacity 1.2s ease;
+.showcase-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+  position: absolute;
 }
-.fade-enter-from {
+
+.showcase-image-hidden {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+  position: absolute;
   opacity: 0;
 }
-.fade-enter-to {
-  opacity: 1;
+
+.device-image {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+  margin: 0 auto;
 }
 
-/* Main content slide-in transition */
-.main-content {
-  opacity: 0;
-  transform: translateY(70px);
-  transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out;
+.benefit {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10%;
+  margin-right: 50%;
+  margin-bottom: 2%;
 }
 
-.main-content.visible {
-  opacity: 1;
-  transform: translateY(0);
+.bg-lightblue {
+  background-color: #8aaabd;
 }
 
-/* Glatte Transformation für das Bild */
-section[ref="pictureSection"] {
-  transition: transform 0.1s linear;
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 3rem;          /* mt-12 */
+  gap: 5rem;                 /* gap-20 */
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  border-radius: 0.75rem;    /* rounded-xl */
+  flex-grow: 1;              /* grow */
+  margin-left: 5rem;         /* ml-20 */
+  margin-right: 2.5rem;      /* mr-10 */
+  text-align: left;          /* text-left */
 }
-</style>
+
+.text-base {
+  font-size: 1.5rem;        /* text-lg */
+}
+
+.text-large {
+  font-size: 2.5rem;        /* text-2xl */
+}
+
+@media (max-width: 768px) {
+  .hero-image-container {
+    width: 70%;
+  }
+
+  .effekt-word {
+    font-size: 2.5rem;
+    font-weight: 600 ;
+  }
+
+  .spacer {
+    height: 48px;
+  }
+
+  .text-base {
+    font-size: 1.2rem;        /* text-lg */
+  }
+
+  .text-large {
+    font-size: 1.6rem;        /* text-2xl */
+  }
+
+  .device-image {
+    max-width: 70%;
+    max-height: 100%;
+    object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+    margin: 0 auto;
+  }
+
+  .showcase-section {
+    width: 100%;           /* zusätzlich */
+    margin: 0;             /* zusätzlich */
+  }
+
+  .showcase-content {
+    flex-direction: column;/* zusätzlich */
+  }
+
+  .mobil-invisible {
+    display: none;
+  }
+
+  .showcase-info {
+    width: 100%;           /* statt 30% */
+    transform: translateX(0px); /* statt -800px */
+    height: fit-content;
+    border-radius: 15px; /* Runde Ecken */
+  }
+
+  .showcase-info-text {
+    padding: 5vh 5vh 8vh 5vh;     /* zusätzlich */
+    gap: 4vh;             /* zusätzlich */
+  }
+
+  .showcase-image {
+  position: relative;
+  }
+
+  .mobil-padding {
+    padding: 8vh 0 5vh 0;
+  }
+
+  .mobil-padding-bottom {
+    padding-top: 10vh;
+  }
+
+  .image-container-invisible {
+    opacity: 1;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    gap: 1rem;             /* zusätzlich */
+    margin: 1rem 1rem 0rem 1rem; /* zusätzlich */
+  }
+
+}
+ </style>

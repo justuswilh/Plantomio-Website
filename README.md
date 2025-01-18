@@ -7,14 +7,17 @@ Look at the [Content documentation](https://content.nuxt.com/) to learn more.
 Make sure to install the dependencies:
 
 ```bash
-# yarn
-yarn install
-
-# npm
-npm install
-
 # pnpm
 pnpm install
+```
+
+## Prisma Client generieren
+
+Make sure to install the dependencies:
+
+```bash
+# pnpm
+pnpx prisma generate
 ```
 
 ## Development Server
