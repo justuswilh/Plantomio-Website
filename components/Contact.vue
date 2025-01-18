@@ -108,12 +108,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 <template>
   <div class="container flex flex-col mx-auto overflow-hidden rounded-xl border-1 border-green-600 m-6 justify-center">
     <div class="flex flex-col bg-primary text-white">
-      <p class="text-4xl font-semibold mt-3 mb-4 text-center justify-top">
+      <p class="sm:text-4xl text-xl font-semibold mt-3 mb-4 text-center justify-top">
         Newsletter und Beta Phase
       </p>
     </div>
-    <Progress class="mt-10 mb-2" />
-    <p class="text-xl leading-loose font-semibold mt-4 mb-4 text-center justify-top">
+    <Progress />
+    <p class="md:text-xl leading-loose font-semibold mt-4 mb-4 text-center justify-top">
       Unsere Beta Phase hat begonnen! <br>
       Interessierte können bereits jetzt die Vorteile smarter Pflanzenversorgung
       erfahren. <br>
@@ -124,7 +124,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     <div class="flex flex-col justify-center mb-6 mx-auto">
       <!-- Entfernen Sie die :schema-Bindung und verwenden stattdessen "v.safeParser(schema)" -->
       <UForm :schema="v.safeParser(schema)" :state="form" class="space-y-4" @submit="onSubmit">
-        <div class="flex flex-row gap-6 justify-center">
+        <div class="flex mx-4 flex-row gap-6 justify-center">
           <!-- Checkboxes -->
           <UFormField name="newsletter">
             <UCheckbox v-model="form.newsletter" label="Newsletter abonnieren" size="xl" />
@@ -175,7 +175,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         <p v-if="confirmationMessage.text" class="text-primary text-xl mt-4 text-center">
           {{ confirmationMessage.text }}
         </p>
-        <p class="text-center mt-8">
+        <p class="text-center mx-4 mt-8">
           Mit dem Absenden des Formulars erkläre ich mich mit den
           <NuxtLink to="/datenschutz" class="font-medium hover:underline">
             Datenschutzbestimmungen
@@ -211,6 +211,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 @media (max-width: 768px) {
   .container {
     width: 98%;
+    margin: 14px auto;
   }
 
   .text-inpust-fields {

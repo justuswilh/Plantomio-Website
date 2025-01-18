@@ -72,7 +72,7 @@ onBeforeUnmount(() => {
     </UCarousel>
 
     <!-- Text-Container unter dem Carousel -->
-    <div class="text-container font-bold text-4xl!">
+    <div class="text-container font-bold text-xl! md:text-4xl!">
       <p>{{ texts[currentIndex] }}</p>
     </div>
   </div>
