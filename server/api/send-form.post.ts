@@ -137,8 +137,9 @@ export default defineEventHandler(async (event) => {
       // DB speichern ist fehlgeschlagen, aber wir fahren fort
     }
 
+    
     // 4) Fallback, wenn sowohl E-Mail als auch DB speichern fehlschlagen
-    if (emailSent) {
+    if (!emailSent && !dbSaved) {
       try {
         await writeToFallback({
           name,
