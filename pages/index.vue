@@ -30,10 +30,12 @@ onMounted(() => {
 
   // ScrollTrigger-Breakpoints mit matchMedia
   mm = ScrollTrigger.matchMedia({
-    '(min-width: 769px)': () => {
+  // Desktop-Trigger für große Bildschirme im Hochformat
+    '(min-width: 1025px) and (min-height: 670px)': () => {
       initDesktopTriggers()
     },
-    '(max-width: 768px)': () => {
+    // Mobile-Trigger für kleine Bildschirme im Hoch- oder Querformat
+    '(max-width: 1024px), (max-height: 669px)': () => {
       initMobileTriggers()
     },
   })
@@ -103,7 +105,7 @@ function initIdleAutoScroll() {
         autoScrolling = true
         autoScrollTween = gsap.to(window, {
           scrollTo: '#showcase-section',
-          duration: 5,
+          duration: 4,
           ease: 'sine.inOut',
           onComplete: () => {
             autoScrolling = false
@@ -287,21 +289,21 @@ function initMobileTriggers() {
 
   // ScrollTrigger für #effekt-word2
   const trigger2 = ScrollTrigger.create({
-      trigger: '#word-section2',
-      start: 'top+=50 center',
-      end: 'bottom+=50 center',
-      pin: true,
-      onEnter: () => {
-        gsap.set('#effekt-word1', { autoAlpha: 0 })
-        gsap.set('#effekt-word2', { autoAlpha: 1 })
-      },
-      onEnterBack: () => {
-        gsap.set('#effekt-word1', { autoAlpha: 0 })
-        gsap.set('#effekt-word2', { autoAlpha: 1 })
-      },
-      onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
-    })
-    scrollTriggers.push(trigger2)
+    trigger: '#word-section2',
+    start: 'top+=50 center',
+    end: 'bottom+=50 center',
+    pin: true,
+    onEnter: () => {
+      gsap.set('#effekt-word1', { autoAlpha: 0 })
+      gsap.set('#effekt-word2', { autoAlpha: 1 })
+    },
+    onEnterBack: () => {
+      gsap.set('#effekt-word1', { autoAlpha: 0 })
+      gsap.set('#effekt-word2', { autoAlpha: 1 })
+    },
+    onLeaveBack: () => gsap.set('#effekt-word2', { autoAlpha: 0 }),
+  })
+  scrollTriggers.push(trigger2)
 
   // ScrollTrigger für #effekt-word3
   const trigger3 = ScrollTrigger.create({
@@ -454,6 +456,7 @@ function initDesktopTriggers() {
   const trigger6 = ScrollTrigger.create({
     trigger: '#showcase-content2',
     start: 'top top',
+    end: 'bottom+=200 top',
     pin: '#showcase-content2',
     pinSpacing: false,
     onEnter: () => {
@@ -765,89 +768,89 @@ function cleanupEventListeners() {
       <div class="benefits-grid">
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/1.svg" alt="Benefit 1 Image" class="">
+            <img src="/benefit/1.svg" alt="Benefit 1 Image" class="benefit-image">
           </div>
-          <p class="md:text-2xl mt-4 font-bold">
+          <p class="text-base mt-4 font-bold">
             Hybrides Monitoring
           </p>
-          <p class="md:text-xl mt-1 font-medium">
+          <p class="text-base2 mt-1 font-medium">
             Messung und Auswertung aller relevanten Einflussfaktoren
           </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/2.svg" alt="Benefit 2 Image" class="">
+            <img src="/benefit/2.svg" alt="Benefit 2 Image" class="benefit-image">
           </div>
-          <p class="md:text-2xl mt-4 font-bold">
+          <p class="text-base mt-4 font-bold">
             Automatische Versorgung
           </p>
-          <p class="md:text-xl mt-1 font-medium">
+          <p class="text-base2 mt-1 font-medium">
             Kabellose, modulare Plug and Play Automatisierung
           </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/3.svg" alt="Benefit 3 Image" class="">
+            <img src="/benefit/3.svg" alt="Benefit 3 Image" class="benefit-image">
           </div>
-          <p class="md:text-2xl mt-4 font-bold">
+          <p class="text-base mt-4 font-bold">
             Intelligente Gartenassistenz
           </p>
-          <p class="md:text-xl mt-1 font-medium">
+          <p class="text-base2 mt-1 font-medium">
             Interaktiv angeleitet, ohne Vorwissen, erfolgreich kultivieren
           </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/4.svg" alt="Benefit 4 Image" class="">
+            <img src="/benefit/4.svg" alt="Benefit 4 Image" class="benefit-image">
           </div>
-          <p class="md:text-2xl mt-4 font-bold">
+          <p class="text-base mt-4 font-bold">
             Smarthome Prinzip
           </p>
-          <p class="md:text-xl mt-1 font-medium">
+          <p class="text-base2 mt-1 font-medium">
             Kabellos, flexibel, unkompliziert, erweiterbar, günstig
           </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/5.svg" alt="Benefit 5 Image" class="">
+            <img src="/benefit/5.svg" alt="Benefit 5 Image" class="benefit-image">
           </div>
-          <p class="md:text-2xl mt-4 font-bold">
+          <p class="text-base mt-4 font-bold">
             Zeitersparnis
           </p>
-          <p class="md:text-xl mt-1 font-medium">
+          <p class="text-base2 mt-1 font-medium">
             Weniger Zeit und Mühe, dafür mehr Zeit zum genießen
           </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/6.svg" alt="Benefit 6 Image" class="">
+            <img src="/benefit/6.svg" alt="Benefit 6 Image" class="benefit-image">
           </div>
-          <p class="md:text-2xl mt-4 font-bold">
+          <p class="text-base mt-4 font-bold">
             Mehr Ertrag
           </p>
-          <p class="md:text-xl mt-1 font-medium">
+          <p class="text-base2 mt-1 font-medium">
             Egal was du ernten willst, wir machen einfach mehr daraus
           </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/7.svg" alt="Benefit 7 Image" class="">
+            <img src="/benefit/7.svg" alt="Benefit 7 Image" class="benefit-image">
           </div>
-          <p class="md:text-2xl mt-4 font-bold">
+          <p class="text-base mt-4 font-bold">
             Versorgung in Abwesenheit
           </p>
-          <p class="md:text-xl mt-1 font-medium">
+          <p class="text-base2 mt-1 font-medium">
             Erfolgreich im Garten, trotz flexiblen Lebensstil
           </p>
         </div>
         <div class="flex flex-col">
           <div class="benefit">
-            <img src="/benefit/8.svg" alt="Benefit 8 Image" class="">
+            <img src="/benefit/8.svg" alt="Benefit 8 Image" class="benefit-image">
           </div>
-          <p class="md:text-2xl mt-4 font-bold">
+          <p class="text-base mt-4 font-bold">
             Keine Sorgen mehr
           </p>
-          <p class="md:text-xl mt-1 font-medium">
+          <p class="text-base2 mt-1 font-medium">
             Nichts im Leben ist sicher aber deine Pflanzen sind nah dran
           </p>
         </div>
@@ -1059,6 +1062,12 @@ function cleanupEventListeners() {
   margin-bottom: 2%;
 }
 
+.benefit-image {
+  max-width: 100%;
+  max-height: 25vh;
+  object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
+}
+
 .bg-lightblue {
   background-color: #8aaabd;
 }
@@ -1080,13 +1089,24 @@ function cleanupEventListeners() {
   font-size: 1.5rem;        /* text-lg */
 }
 
+.text-base2 {
+  font-size: 1.2rem;        /* text-lg */
+}
+
 .text-large {
   font-size: 2.5rem;        /* text-2xl */
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px), (max-height: 669px) {
   .hero-image-container {
     width: 70%;
+  }
+
+  .hero-image {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  max-height: 70vh;
   }
 
   .effekt-word {
@@ -1108,7 +1128,7 @@ function cleanupEventListeners() {
 
   .device-image {
     max-width: 70%;
-    max-height: 100%;
+    max-height: 40vh;
     object-fit: contain; /* Bild so groß wie möglich ohne Beschneiden */
     margin: 0 auto;
   }

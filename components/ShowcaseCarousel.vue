@@ -72,7 +72,7 @@ onBeforeUnmount(() => {
     </UCarousel>
 
     <!-- Text-Container unter dem Carousel -->
-    <div class="text-container font-bold text-xl! md:text-4xl!">
+    <div class="text-container font-bold">
       <p>{{ texts[currentIndex] }}</p>
     </div>
   </div>
@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
   .text-container {
     text-align: center;
     padding-top: 20vh;
-    font-size: 1.2rem;
+    font-size: 2rem;
     /* Weitere Styles nach Bedarf */
   }
 
@@ -110,6 +110,28 @@ onBeforeUnmount(() => {
     min-height: 60vh;
     width: 80%;
     margin: 20vh auto;
+  }
+  .text-container {
+    font-size: 1.2rem;
+  }
+}
+
+  @media (max-width: 768px) and (orientation: landscape) {
+    .settings {
+      max-width: 50%;
+      margin: 0 auto;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1025px) {
+  .section {
+    min-height: 60vh;
+    max-height: 100vh;
+    width: 95%;
+    margin: 20vh auto;
+  }
+  .text-container {
+    font-size: 1.3rem;
   }
   }
   </style>
