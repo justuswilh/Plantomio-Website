@@ -29,8 +29,11 @@ export default defineEventHandler(async (event) => {
       )
     }
 
-    // 2) E-Mail versenden (unabhängig von der DB-Speicherung)
+    // Flags zur Überwachung des Erfolgs der Operationen
     let emailSent = false
+    let dbSaved = false
+
+    // 2) E-Mail versenden (unabhängig von der DB-Speicherung)
     try {
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -65,6 +68,7 @@ export default defineEventHandler(async (event) => {
 
       await transporter.sendMail(mailOptions)
       emailSent = true
+      console.log('E-Mail erfolgreich gesendet.')
     }
     catch (emailError) {
       console.error('Fehler beim Senden der E-Mail:', emailError)
@@ -72,7 +76,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // 3) Daten in Supabase speichern
-    let dbSaved = false
     try {
       const { data, error } = await supabase
         .from('interested_user') // Tabellenname in Supabase
@@ -91,6 +94,7 @@ export default defineEventHandler(async (event) => {
       }
 
       dbSaved = true
+      console.log('Daten erfolgreich in der Datenbank gespeichert.')
     }
     catch (dbError) {
       console.error('Fehler beim Speichern in der Datenbank:', JSON.stringify(dbError, null, 2))
@@ -103,13 +107,11 @@ export default defineEventHandler(async (event) => {
       // DB speichern ist fehlgeschlagen, aber wir fahren fort
     }
 
-    // 4) Entfernt den JSON-Fallback
-
-    // Optional: Informiere den Benutzer, wenn sowohl E-Mail als auch DB-Speicherung fehlgeschlagen sind
+    // 4) Überprüfen, ob beide Operationen fehlgeschlagen sind
     if (!emailSent && !dbSaved) {
       return sendError(
         event,
-        createError({ statusCode: 500, statusMessage: 'Ups!? Leider ist etwas schief gegangen. Bitte schreib uns stattdessen eine kurze mail oder versuche es später erneut.' }),
+        createError({ statusCode: 500, statusMessage: 'Ups!? Leider ist etwas schief gegangen. Bitte schreib uns stattdessen eine kurze Mail oder versuche es später erneut.' }),
       )
     }
 
