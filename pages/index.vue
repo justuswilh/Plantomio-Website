@@ -1086,7 +1086,7 @@ function cleanupEventListeners() {
 }
 
 .text-base {
-  font-size: 1.5rem;        /* text-lg */
+  font-size: 1.4rem;        /* text-lg */
 }
 
 .text-base2 {
