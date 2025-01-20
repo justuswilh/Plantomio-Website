@@ -17,7 +17,7 @@ type Schema = v.InferOutput<typeof schema>
 
 // Reaktiver Zustand des Formulars
 const form = reactive<Schema>({
-  newsletter: false,
+  newsletter: true,
   betaProgram: false,
   name: '',
   familyName: '',
