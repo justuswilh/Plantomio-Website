@@ -8,9 +8,8 @@ const schema = v.object({
   newsletter: v.boolean(),
   betaProgram: v.boolean(),
   name: v.pipe(v.string(), v.minLength(1, 'Name ist erforderlich')),
-  nachname: v.pipe(v.string(), v.minLength(1, 'Nachname ist erforderlich')),
+  familyName: v.pipe(v.string(), v.minLength(1, 'Nachname ist erforderlich')),
   email: v.pipe(v.string(), v.email('Ungültige E-Mail-Adresse')),
-  text: v.string(),
 })
 
 // Inferenz des Schematyps
@@ -21,9 +20,8 @@ const form = reactive<Schema>({
   newsletter: false,
   betaProgram: false,
   name: '',
-  nachname: '',
+  familyName: '',
   email: '',
-  text: '',
 })
 
 // Reaktiver Zustand für Validierungsfehler
@@ -31,9 +29,8 @@ const errors = reactive<Record<keyof Schema, string | null>>({
   newsletter: null,
   betaProgram: null,
   name: null,
-  nachname: null,
+  familyName: null,
   email: null,
-  text: null,
 })
 
 // Reaktiver Zustand für die Bestätigungsnachricht
@@ -75,7 +72,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(form), // Sende genau die Felder: newsletter, betaProgram, name, nachname, email
+      body: JSON.stringify(form), // Sende genau die Felder: newsletter, betaProgram, name, familyName, email
     })
     const sendFormResult = await sendFormResponse.json()
 
@@ -95,7 +92,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     form.newsletter = true
     form.betaProgram = false
     form.name = ''
-    form.nachname = ''
+    form.familyName = ''
     form.email = ''
   }
   catch (error) {
@@ -147,11 +144,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           </UFormField>
 
           <!-- Nachname -->
-          <UFormField label="Nachname" size="xl" name="nachname" required>
-            <UInput v-model="form.nachname" placeholder="Ihr Nachname" />
+          <UFormField label="Nachname" size="xl" name="familyName" required>
+            <UInput v-model="form.familyName" placeholder="Ihr Nachname" />
             <!-- Fehleranzeige für Nachname -->
-            <p v-if="errors.nachname" class="text-red-500 text-sm mt-1">
-              {{ errors.nachname }}
+            <p v-if="errors.familyName" class="text-red-500 text-sm mt-1">
+              {{ errors.familyName }}
             </p>
           </UFormField>
 
