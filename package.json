@@ -3,8 +3,6 @@
   "private": true,
   "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "prisma:generate": "prisma generate",
-    "prebuild": "pnpx prisma generate",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
@@ -23,7 +21,7 @@
     "@nuxt/schema": "^3.15.2",
     "@nuxt/ui": "3.0.0-alpha.10",
     "@nuxthq/studio": "^2.2.1",
-    "@prisma/client": "^6.2.1",
+    "@supabase/supabase-js": "^2.47.16",
     "@vueuse/nuxt": "^11.3.0",
     "consola": "^3.4.0",
     "defu": "^6.1.4",
@@ -45,7 +43,6 @@
     "@antfu/eslint-config": "^3.14.0",
     "@iconify-json/lucide": "^1.2.23",
     "@iconify-json/material-symbols": "^1.2.12",
-    "eslint": "^9.18.0",
-    "prisma": "^6.2.1"
+    "eslint": "^9.18.0"
   }
 }

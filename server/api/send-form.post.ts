@@ -1,67 +1,20 @@
 import process from 'node:process'
-import { PrismaClient } from '@prisma/client'
-// server/api/send-form.post.ts
+import { createClient } from '@supabase/supabase-js' // Supabase-Import hinzufügen
 import { createError, defineEventHandler, readBody, sendError } from 'h3'
 import nodemailer from 'nodemailer'
-import fs from 'fs/promises'
-import path from 'path'
 
-const prisma = new PrismaClient()
-
-// Funktion zum Schreiben in fallback.json
-const writeToFallback = async (submission: {
-  name: string
-  nachname: string
-  email: string
-  newsletter: boolean
-  betaProgram: boolean
-}) => {
-  const fallbackPath = path.join(process.cwd(), 'fallback.json')
-
-  try {
-    // Versuche, die bestehende fallback.json zu lesen
-    const data = await fs.readFile(fallbackPath, 'utf-8')
-    const submissions = JSON.parse(data)
-
-    if (!Array.isArray(submissions)) {
-      throw new Error('fallback.json ist kein gültiges Array.')
-    }
-
-    // Füge die neue Submission hinzu
-    submissions.push({
-      ...submission,
-      timestamp: new Date().toISOString(),
-    })
-
-    // Schreibe die aktualisierte Liste zurück
-    await fs.writeFile(fallbackPath, JSON.stringify(submissions, null, 2), 'utf-8')
-  }
-  catch (error: any) {
-    if (error.code === 'ENOENT') {
-      // fallback.json existiert nicht, erstelle eine neue Datei mit der ersten Submission
-      const initialData = [
-        {
-          ...submission,
-          timestamp: new Date().toISOString(),
-        },
-      ]
-      await fs.writeFile(fallbackPath, JSON.stringify(initialData, null, 2), 'utf-8')
-    }
-    else {
-      // Andere Fehler
-      console.error('Fehler beim Schreiben in fallback.json:', error)
-      throw error // Optional: Re-throw, wenn du weitere Maßnahmen ergreifen möchtest
-    }
-  }
-}
+// Supabase-Client initialisieren
+const supabaseUrl = 'https://zjyvmawmznpzarynvcyw.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    const { newsletter, betaProgram, name, nachname, email } = body
+    const { newsletter, betaProgram, name, familyName, email } = body
 
     // 1) Validierung
-    if (!name || !nachname || !email) {
+    if (!name || !familyName || !email) {
       return sendError(
         event,
         createError({ statusCode: 400, statusMessage: 'Name, Nachname und E-Mail sind erforderlich.' }),
@@ -97,7 +50,7 @@ export default defineEventHandler(async (event) => {
           Newsletter: ${newsletter ? 'Ja' : 'Nein'}
           Beta Programm: ${betaProgram ? 'Ja' : 'Nein'}
           Name: ${name}
-          Nachname: ${nachname}
+          Nachname: ${familyName}
           E-Mail: ${email}
         `,
         html: `
@@ -105,7 +58,7 @@ export default defineEventHandler(async (event) => {
           <p><strong>Newsletter:</strong> ${newsletter ? 'Ja' : 'Nein'}</p>
           <p><strong>Beta Programm:</strong> ${betaProgram ? 'Ja' : 'Nein'}</p>
           <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Nachname:</strong> ${nachname}</p>
+          <p><strong>Nachname:</strong> ${familyName}</p>
           <p><strong>E-Mail:</strong> ${email}</p>
         `,
       }
@@ -118,46 +71,46 @@ export default defineEventHandler(async (event) => {
       // E-Mail senden ist fehlgeschlagen, aber wir fahren fort
     }
 
-    // 3) Daten in DB speichern
+    // 3) Daten in Supabase speichern
     let dbSaved = false
     try {
-      await prisma.submission.create({
-        data: {
-          name,
-          nachname,
-          email,
-          newsletter: !!newsletter,
-          betaProgram: !!betaProgram,
-        },
-      })
+      const { data, error } = await supabase
+        .from('interested_user') // Tabellenname in Supabase
+        .insert([
+          {
+            name,
+            family_name: familyName,
+            email,
+            newsletter,
+            beta_program: betaProgram,
+          },
+        ])
+
+      if (error) {
+        throw error
+      }
+
       dbSaved = true
     }
     catch (dbError) {
-      console.error('Fehler beim Speichern in der Datenbank:', dbError)
+      console.error('Fehler beim Speichern in der Datenbank:', JSON.stringify(dbError, null, 2))
+      if (dbError.message) {
+        console.error('Fehlermeldung:', dbError.message)
+      }
+      if (dbError.details) {
+        console.error('Details:', dbError.details)
+      }
       // DB speichern ist fehlgeschlagen, aber wir fahren fort
     }
 
-    
-    // 4) Fallback, wenn sowohl E-Mail als auch DB speichern fehlschlagen
+    // 4) Entfernt den JSON-Fallback
+
+    // Optional: Informiere den Benutzer, wenn sowohl E-Mail als auch DB-Speicherung fehlgeschlagen sind
     if (!emailSent && !dbSaved) {
-      try {
-        await writeToFallback({
-          name,
-          nachname,
-          email,
-          newsletter: !!newsletter,
-          betaProgram: !!betaProgram,
-        })
-        console.warn('Daten wurden in fallback.json gespeichert.')
-      }
-      catch (fallbackError) {
-        console.error('Fehler beim Speichern in fallback.json:', fallbackError)
-        // Optional: Weitere Maßnahmen, z.B. Benachrichtigungen an Admins
-        return sendError(
-          event,
-          createError({ statusCode: 500, statusMessage: 'Fehler beim Speichern der Daten.' }),
-        )
-      }
+      return sendError(
+        event,
+        createError({ statusCode: 500, statusMessage: 'Ups!? Leider ist etwas schief gegangen. Bitte schreib uns stattdessen eine kurze mail oder versuche es später erneut.' }),
+      )
     }
 
     // 5) Antwortnachricht erstellen

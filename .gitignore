@@ -7,5 +7,4 @@ node_modules
 .data
 .env
 fallback.json
-prisma/dev.db
 dist
