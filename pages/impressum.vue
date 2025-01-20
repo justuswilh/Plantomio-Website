@@ -58,7 +58,7 @@ export default {
     <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank">https://ec.europa.eu/consumers/odr/</a>.</p>
     <p>Unsere E-Mail-Adresse finden Sie oben im Impressum.</p>
 
-    <h2>Verbraucherstreitbeilegung/Universalschlichtungsstelle</h2>
+    <h2>Verbraucherstreitbeilegung/ Universalschlichtungsstelle</h2>
     <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
   </div>
 </template>
