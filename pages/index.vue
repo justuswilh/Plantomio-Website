@@ -78,6 +78,7 @@ function initIdleAutoScroll() {
     start: 'top top',
     onEnter: () => {
       disableAutoScroll()
+      setAnimationCompleted()
     },
   })
   scrollTriggers.push(trigger1)
@@ -446,9 +447,6 @@ function initDesktopTriggers() {
     pin: '#showcase-content1',
     pinSpacing: false,
     scrub: true,
-    onEnter: () => {
-      setAnimationCompleted()
-    },
   })
   scrollTriggers.push(trigger5)
 
@@ -1180,6 +1178,5 @@ function cleanupEventListeners() {
     gap: 1rem;             /* zusätzlich */
     margin: 1rem 1rem 0rem 1rem; /* zusätzlich */
   }
-
 }
  </style>

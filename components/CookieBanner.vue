@@ -66,10 +66,11 @@ function rejectCookies() {
     <div class="cookie-content">
       <p>
         Wir verwenden Cookies, um Ihre Erfahrung auf unserer Website zu verbessern und personalisierte Inhalte bereitzustellen. <br>
-        Weitere Informationen finden Sie in unserer <NuxtLink href="/datenschutz" class="underline text-white">
-          Datenschutz
-        </NuxtLink>.
+        Weitere Informationen finden Sie in unserer <NuxtLink href="/datenschutz" title="d" class="text-white font-semibold underline">
+          Datenschutzerklärung.
+        </NuxtLink>
       </p>
+
       <div class="cookie-buttons">
         <UButton color="primary" variant="outline" @click="acceptCookies">
           Akzeptieren
@@ -146,5 +147,11 @@ function rejectCookies() {
 
   .cookie-buttons button:last-child:hover {
     background-color: #da190b;
+  }
+
+  @media (max-width: 1024px), (max-height: 669px) {
+    .cookie-content {
+      flex-direction: column;
+    }
   }
   </style>
