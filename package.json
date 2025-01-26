@@ -21,7 +21,7 @@
     "@nuxt/schema": "^3.15.2",
     "@nuxt/ui": "3.0.0-alpha.10",
     "@nuxthq/studio": "^2.2.1",
-    "@supabase/supabase-js": "^2.47.16",
+    "@supabase/supabase-js": "^2.48.0",
     "@vueuse/nuxt": "^11.3.0",
     "consola": "^3.4.0",
     "defu": "^6.1.4",
@@ -32,7 +32,10 @@
     "is-glob": "^4.0.3",
     "nodemailer": "^6.9.16",
     "nuxt": "^3.15.2",
+    "nuxt-medusa": "^1.0.0",
+    "pg": "^8.13.1",
     "pnpm": "^9.15.4",
+    "postgres": "^3.4.5",
     "ts-case-convert": "^2.1.0",
     "typescript": "^5.7.3",
     "valibot": "1.0.0-beta.12",
@@ -41,7 +44,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.14.0",
-    "@iconify-json/lucide": "^1.2.23",
+    "@iconify-json/lucide": "^1.2.24",
     "@iconify-json/material-symbols": "^1.2.12",
     "eslint": "^9.18.0"
   }

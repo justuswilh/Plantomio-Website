@@ -4,7 +4,7 @@ import { createError, defineEventHandler, readBody, sendError } from 'h3'
 import nodemailer from 'nodemailer'
 
 // Supabase-Client initialisieren
-const supabaseUrl = 'https://zjyvmawmznpzarynvcyw.supabase.co'
+const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 

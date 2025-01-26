@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@nuxt/content',
     '@nuxtjs/color-mode',
     '@nuxthq/studio',
+    'nuxt-medusa',
   ],
 
   plugins: ['~/plugins/vue3-cookies.js'],
@@ -39,4 +40,11 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-12-22',
+
+  runtimeConfig: {
+    public: {
+      medusaApiUrl: process.env.PUBLIC_MEDUSA_API_URL,
+      medusaPublishableKey: process.env.PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    },
+  },
 })
