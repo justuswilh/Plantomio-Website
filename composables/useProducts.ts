@@ -17,6 +17,7 @@ export function useProducts() {
         headers: {
           'x-publishable-api-key': config.public.medusaPublishableKey,
         },
+        credentials: 'include',
       })
 
       products.value = response.products
