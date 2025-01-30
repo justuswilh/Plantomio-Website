@@ -1,68 +1,66 @@
-import type { HttpTypes } from '@medusajs/types'
+import type { Product } from '~/types'
+import { useRuntimeConfig } from '#imports'
 // composables/useProduct.ts
-import { computed, ref } from 'vue'
-import { useProducts } from './useProducts'
+import { ref } from 'vue'
 
-export function useProduct(id: string, regionId: string) {
-  const { fetchProduct, isLoading, error } = useProducts()
-  const product = ref<HttpTypes.StoreProduct | null>(null)
-  const selectedOptions = ref<Record<string, string>>({})
+export function useProduct(productHandle: string) {
+  const product = ref<Product | null>(null)
+  const error = ref<Error | null>(null)
+  const isLoading = ref<boolean>(false)
 
-  const loadProduct = async () => {
-    const data = await fetchProduct(id, regionId)
-    if (data) {
-      product.value = data
+  const fetchProduct = async () => {
+    if (!productHandle) {
+      error.value = new Error('Kein Produkt-Handle angegeben.')
+      return
+    }
+
+    isLoading.value = true
+    try {
+      const config = useRuntimeConfig()
+      console.log('Medusa API URL:', config.public.medusaApiUrl)
+      console.log('Medusa Publishable Key:', config.public.medusaPublishableKey)
+      console.log('Suchparameter (Handle):', productHandle)
+
+      // Abrufen des Produkts anhand des Handles
+      const response = await $fetch(`${config.public.medusaApiUrl}/store/products`, {
+        headers: {
+          'x-publishable-api-key': config.public.medusaPublishableKey,
+        },
+        params: { handle: productHandle }, // Verwenden Sie 'handle' als Suchparameter
+        credentials: 'include',
+      })
+
+      console.log('API Response:', response)
+
+      // Überprüfen, ob die Antwort das erwartete Format hat
+      if (!response || !Array.isArray(response.products)) {
+        throw new Error('Ungültige API-Antwort: "products" nicht gefunden oder kein Array.')
+      }
+
+      console.log('Gefundene Produkte:', response.products)
+
+      // Finden des Produkts mit exakt passendem Handle
+      const matchedProduct = response.products.find(
+        (p: Product) => p.handle && p.handle.toLowerCase() === productHandle.toLowerCase(),
+      )
+
+      if (matchedProduct) {
+        product.value = matchedProduct
+        console.log('Gefundenes Produkt:', matchedProduct)
+      }
+      else {
+        product.value = null
+        console.warn(`Kein Produkt mit dem Handle "${productHandle}" gefunden.`)
+      }
+    }
+    catch (err) {
+      error.value = err as Error
+      console.error('Fehler beim Laden des Produkts:', err)
+    }
+    finally {
+      isLoading.value = false
     }
   }
 
-  // Berechne die ausgewählte Variante
-  const selectedVariant = computed(() => {
-    if (
-      !product.value?.variants
-      || !product.value.options
-      || Object.keys(selectedOptions.value).length !== product.value.options.length
-    ) {
-      return undefined
-    }
-
-    return product.value.variants.find(variant =>
-      variant.options?.every(optionValue =>
-        optionValue.value === selectedOptions.value[optionValue.option_id!],
-      ),
-    )
-  })
-
-  // Sortiere die Varianten nach Preis, falls keine Variante ausgewählt ist
-  const selectedVariantPrice = computed(() => {
-    if (selectedVariant.value) {
-      return selectedVariant.value
-    }
-
-    return product.value?.variants?.sort((a, b) =>
-      a.calculated_price.calculated_amount - b.calculated_price.calculated_amount,
-    )[0]
-  })
-
-  // Formatiere den Preis entsprechend der Region
-  const price = computed(() => {
-    if (!selectedVariantPrice.value) {
-      return undefined
-    }
-
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: product.value?.region?.currency_code || 'USD',
-    }).format(selectedVariantPrice.value.calculated_price.calculated_amount)
-  })
-
-  return {
-    product,
-    isLoading,
-    error,
-    selectedOptions,
-    selectedVariant,
-    selectedVariantPrice,
-    price,
-    loadProduct,
-  }
+  return { product, error, isLoading, fetchProduct }
 }

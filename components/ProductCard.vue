@@ -1,234 +1,105 @@
-<!-- components/ProduktCard.vue -->
+<!-- components/ProductCard.vue -->
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
-interface OptionValue {
-  id: string
-  value: string
-  option_id: string
-  metadata: any
-  created_at: string
-  updated_at: string
-  deleted_at: string | null
-}
-
-interface Option {
-  id: string
-  title: string
-  product_id: string
-  metadata: any
-  created_at: string
-  updated_at: string
-  deleted_at: string | null
-  values: OptionValue[]
-}
-
-interface Image {
-  id: string
-  url: string
-  metadata: any
-  created_at: string
-  updated_at: string
-  deleted_at: string | null
-}
-
-interface Price {
-  amount: number
-  currency_code: string
-}
-
-interface VariantOption {
-  id: string
-  value: string
-  option_id: string
-  option: {
-    id: string
-    title: string
-    product_id: string
-    metadata: any
-    created_at: string
-    updated_at: string
-    deleted_at: string | null
-  }
-  metadata: any
-  created_at: string
-  updated_at: string
-  deleted_at: string | null
-}
-
-interface Variant {
-  id: string
-  title: string
-  sku: string
-  barcode: string | null
-  ean: string | null
-  upc: string | null
-  allow_backorder: boolean
-  manage_inventory: boolean
-  hs_code: string | null
-  origin_country: string | null
-  mid_code: string | null
-  material: string | null
-  weight: string | null
-  length: string | null
-  height: string | null
-  width: string | null
-  metadata: any
-  variant_rank: number
-  product_id: string
-  created_at: string
-  updated_at: string
-  deleted_at: string | null
-  options: VariantOption[]
-  prices?: Price[] // Annahme: Preise sind unter den Varianten verfügbar
-}
-
-interface Product {
-  id: string
-  title: string
-  subtitle: string | null
-  description: string
-  handle: string
-  is_giftcard: boolean
-  discountable: boolean
-  thumbnail: string
-  collection_id: string | null
-  type_id: string | null
-  weight: string
-  length: string | null
-  height: string | null
-  width: string | null
-  hs_code: string | null
-  origin_country: string | null
-  mid_code: string | null
-  material: string | null
-  created_at: string
-  updated_at: string
-  type: any
-  collection: any
-  options: Option[]
-  tags: string[]
-  images: Image[]
-  variants: Variant[]
-}
+import type { Product, Variant } from '~/types'
+import { useRuntimeConfig } from '#imports'
 
 const props = defineProps<{
   product: Product
+  showDetails?: boolean
 }>()
 
+const config = useRuntimeConfig()
+
+/**
+ * Formatiert den Preis von Cent in Euro.
+ * @param amount - Der Preis in Cent.
+ * @returns Der formatierte Preis in Euro.
+ */
 function formatPrice(amount: number): string {
-  return `${(amount / 100).toFixed(2)}`
+  return `${(amount / 100).toFixed(2)}€`
+}
+
+/**
+ * Gibt den Preis einer Variante zurück.
+ * @param variant - Die Produktvariante.
+ * @returns Der Preis der Variante oder null, falls nicht verfügbar.
+ */
+function getVariantPrice(variant: Variant): number | null {
+  // Stellen Sie sicher, dass die Variante ein price Feld hat
+  return variant.price || null
+}
+
+/**
+ * Generiert die vollständige Bild-URL.
+ * @param url - Die Bild-URL aus der API.
+ * @returns Die vollständige Bild-URL.
+ */
+function getImageUrl(url: string): string {
+  if (url.startsWith('http')) {
+    return url
+  }
+  // Falls die URL relativ ist, fügen Sie die Medusa API URL hinzu
+  return `${config.public.medusaApiUrl}${url}`
 }
 </script>
 
 <template>
-  <div class="product-card">
-    <div class="product-images">
-      <img
-        v-for="image in product.images"
-        :key="image.id"
-        :src="image.url"
-        :alt="product.title"
-        class="product-image"
-      >
-    </div>
-    <div class="product-details">
-      <h2>{{ product.title }}</h2>
-      <p v-if="product.subtitle" class="product-subtitle">
-        {{ product.subtitle }}
-      </p>
-      <p class="product-description">
-        {{ product.description }}
-      </p>
-
-      <div v-if="product.options && product.options.length" class="product-options">
-        <h3>Optionen:</h3>
-        <div v-for="option in product.options" :key="option.id" class="option">
-          <strong>{{ option.title }}:</strong>
-          <span v-for="value in option.values" :key="value.id" class="option-value">
-            {{ value.value }}
-          </span>
-        </div>
+  <NuxtLink v-if="!showDetails && product.handle" :to="`/produkte/${encodeURIComponent(product.handle)}`" class="product-link">
+    <div class="product-card">
+      <div class="product-images">
+        <!-- <img
+          v-for="image in product.images"
+          :key="image.id"
+          :src="getImageUrl(image.url)"
+          :alt="product.title"
+          class="product-image"
+        > -->
+        <img src="https://placehold.co/600x400" alt="Platzhalterbild">
       </div>
-
-      <div v-if="product.variants && product.variants.length" class="product-variants">
-        <h3>Varianten:</h3>
-        <ul>
-          <li v-for="variant in product.variants" :key="variant.id" class="variant">
-            <div class="variant-title">
-              {{ variant.title }}
-            </div>
-            <div class="variant-sku">
-              SKU: {{ variant.sku }}
-            </div>
-            <div class="variant-price">
-              Preis:
-              <span v-if="variant.prices && variant.prices.length">
-                {{ formatPrice(variant.prices[0].amount) }}€
-              </span>
-              <span v-else>
-                Preis nicht verfügbar
-              </span>
-            </div>
-          </li>
-        </ul>
+      <div class="product-details">
+        <h2>{{ product.title }}</h2>
+        <p v-if="product.subtitle" class="subtitle">
+          {{ product.subtitle }}
+        </p>
+        <p class="description">
+          {{ product.description }}
+        </p>
       </div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <style scoped>
 .product-card {
-  display: flex;
-  flex-direction: row;
   border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  margin-bottom: 20px;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  max-width: 640px;
+  max-height: 560px;
 }
 
 .product-images {
-  flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
 .product-image {
-  width: 100%;
-  height: auto;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   border-radius: 4px;
 }
 
 .product-details {
-  flex: 2;
-  margin-left: 20px;
-}
-
-.product-subtitle {
-  color: #666;
-  font-style: italic;
+  margin-top: 20px;
 }
 
 .product-description {
   margin: 10px 0;
-}
-
-.product-options, .product-variants {
-  margin-top: 15px;
-}
-
-.option {
-  margin-bottom: 10px;
-}
-
-.option-value {
-  display: inline-block;
-  margin-right: 10px;
-  background-color: #f5f5f5;
-  padding: 5px 10px;
-  border-radius: 4px;
 }
 
 .variant {
@@ -239,7 +110,25 @@ function formatPrice(amount: number): string {
   font-weight: bold;
 }
 
-.variant-sku, .variant-price {
-  margin-left: 10px;
+h2 {
+  font-size: 1.9cap;
+  font-weight: 700;
+  color: green;
+}
+
+.subtitle {
+  font-size: 1.7cap;
+  font-weight: 500;
+}
+
+.description {
+  margin: 2px 0 0 0;
+  font-size: 1.5cap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: clip;
+  word-break: normal;
 }
 </style>
