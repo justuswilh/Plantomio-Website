@@ -32,7 +32,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'node-server',
+    preset: 'netlify',
     hooks: {
       'nitro:config': function (config) {
         // Falls die Variable PORT existiert, nutze sie
