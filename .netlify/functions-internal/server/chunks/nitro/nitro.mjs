@@ -4734,7 +4734,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "1d141eff-b66d-4181-9a04-b3704972c064",
+    "buildId": "99da4048-483a-4f52-aa0d-c59c45621e24",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -4816,7 +4816,7 @@ const _inlineRuntimeConfig = {
     "content": {
       "locales": [],
       "defaultLocale": "",
-      "integrity": 1738331914689,
+      "integrity": 1738335453546,
       "experimental": {
         "stripQueryParameters": false,
         "advanceQuery": false,
@@ -5854,15 +5854,15 @@ async function dispose(driver) {
 const _assets = {
   ["nitro:bundled:cache:content:content-index.json"]: {
     import: () => import('../raw/content-index.mjs').then(r => r.default || r),
-    meta: {"type":"application/json","etag":"\"1d-ZKH/PKBxhxS9692xKOs2A/V4+qc\"","mtime":"2025-01-31T13:59:07.344Z"}
+    meta: {"type":"application/json","etag":"\"1d-ZKH/PKBxhxS9692xKOs2A/V4+qc\"","mtime":"2025-01-31T14:58:02.825Z"}
   },
   ["nitro:bundled:cache:content:content-navigation.json"]: {
     import: () => import('../raw/content-navigation.mjs').then(r => r.default || r),
-    meta: {"type":"application/json","etag":"\"28-UHPIapjVzD7d8K2C5xLxuEDv+yU\"","mtime":"2025-01-31T13:59:07.344Z"}
+    meta: {"type":"application/json","etag":"\"28-UHPIapjVzD7d8K2C5xLxuEDv+yU\"","mtime":"2025-01-31T14:58:02.825Z"}
   },
   ["nitro:bundled:cache:content:parsed:content:home.md"]: {
     import: () => import('../raw/home.mjs').then(r => r.default || r),
-    meta: {"type":"text/markdown; charset=utf-8","etag":"\"3cf-xnK4q14Q5GTGP6cSZ8QTbUsi630\"","mtime":"2025-01-31T13:59:07.344Z"}
+    meta: {"type":"text/markdown; charset=utf-8","etag":"\"3cf-xnK4q14Q5GTGP6cSZ8QTbUsi630\"","mtime":"2025-01-31T14:58:02.826Z"}
   }
 };
 
@@ -15355,7 +15355,7 @@ const handlers = [
   { route: '/api/_content/query/:qid/**:params', handler: _9R499H, lazy: false, middleware: false, method: "get" },
   { route: '/api/_content/query/:qid', handler: _9R499H, lazy: false, middleware: false, method: "get" },
   { route: '/api/_content/query', handler: _9R499H, lazy: false, middleware: false, method: "get" },
-  { route: '/api/_content/cache.1738331914689.json', handler: _kGunVv, lazy: false, middleware: false, method: "get" },
+  { route: '/api/_content/cache.1738335453546.json', handler: _kGunVv, lazy: false, middleware: false, method: "get" },
   { route: '/api/_content/navigation/:qid/**:params', handler: _BQ0yPh, lazy: false, middleware: false, method: "get" },
   { route: '/api/_content/navigation/:qid', handler: _BQ0yPh, lazy: false, middleware: false, method: "get" },
   { route: '/api/_content/navigation', handler: _BQ0yPh, lazy: false, middleware: false, method: "get" },
