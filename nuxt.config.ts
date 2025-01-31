@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   plugins: ['~/plugins/vue3-cookies.js'],
 
   routeRules: {
-    '/': { prerender: true },
+    '/': { prerender: false },
   },
 
   content: {
@@ -32,6 +32,16 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    preset: 'node-server',
+    hooks: {
+      'nitro:config': function (config) {
+        // Falls die Variable PORT existiert, nutze sie
+        if (process.env.PORT) {
+          config.server = config.server || {}
+          config.server.port = Number.parseInt(process.env.PORT)
+        }
+      },
+    },
     esbuild: {
       options: {
         target: 'esnext',
