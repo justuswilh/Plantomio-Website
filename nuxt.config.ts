@@ -32,16 +32,16 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'netlify',
-    hooks: {
-      'nitro:config': function (config) {
-        // Falls die Variable PORT existiert, nutze sie
-        if (process.env.PORT) {
-          config.server = config.server || {}
-          config.server.port = Number.parseInt(process.env.PORT)
-        }
-      },
-    },
+    // preset: 'netlify',
+    // hooks: {
+    //   'nitro:config': function (config) {
+    //     // Falls die Variable PORT existiert, nutze sie
+    //     if (process.env.PORT) {
+    //       config.server = config.server || {}
+    //       config.server.port = Number.parseInt(process.env.PORT)
+    //     }
+    //   },
+    // },
     esbuild: {
       options: {
         target: 'esnext',
